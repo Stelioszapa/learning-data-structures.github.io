@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="el">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μαθαίνοντας Δομές Δεδομένων!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --c1: #FF6B6B;
+      --c2: #4ECDC4;
+      --c3: #FFE66D;
+      --c4: #A29BFE;
+      --c5: #FD79A8;
+      --c6: #6C5CE7;
+      --c7: #00CEC9;
+      --c8: #FDCB6E;
+      --bg: #0F0E2E;
+      --surface: #1A1950;
+      --card: #22205F;
+      --text: #F0EEFF;
+      --muted: #9B99CC;
+      --radius: 18px;
+      --r-sm: 10px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 20%, #2d1b69 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, #1a3a5c 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 40%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 50% 10%, rgba(255, 255, 255, 0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 60%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 25%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 70%, rgba(255, 255, 255, 0.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 45% 85%, rgba(255, 255, 255, 0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 90%, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem 1.5rem 3rem;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .header h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      background: linear-gradient(135deg, var(--c3) 0%, var(--c1) 50%, var(--c4) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      margin-bottom: .3rem;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    /* NAV TABS */
+    .nav {
+      display: flex;
+      gap: .6rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: .5rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--c4) rgba(255, 255, 255, 0.1);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .nav::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .nav::-webkit-scrollbar-thumb {
+      background: var(--c4);
+      border-radius: 10px;
+    }
+
+    .tab {
+      flex: 0 0 auto;
+      padding: .5rem 1rem;
+      border-radius: 50px;
+      border: 2px solid transparent;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .25s;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      border-color: var(--c2);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    .tab.active {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .tab[data-id="home"].active {
+      background: var(--surface);
+      border-color: #fff;
+      color: #fff;
+    }
+
+    .tab[data-id="array"].active {
+      background: var(--c1);
+      border-color: var(--c1);
+    }
+
+    .tab[data-id="stack"].active {
+      background: var(--c2);
+      border-color: var(--c2);
+    }
+
+    .tab[data-id="queue"].active {
+      background: var(--c8);
+      border-color: var(--c8);
+      color: #333;
+    }
+
+    .tab[data-id="linkedlist"].active {
+      background: var(--c4);
+      border-color: var(--c4);
+    }
+
+    .tab[data-id="tree"].active {
+      background: var(--c5);
+      border-color: var(--c5);
+    }
+
+    .tab[data-id="heap"].active {
+      background: var(--c7);
+      border-color: var(--c7);
+    }
+
+    .tab[data-id="quiz"].active {
+      background: var(--c3);
+      border-color: var(--c3);
+      color: #333;
+    }
+
+    .tab[data-id="sort"].active {
+      background: #e056fd;
+      border-color: #e056fd;
+      color: #fff;
+    }
+
+    .tab[data-id="interactive"].active {
+      background: var(--c6);
+      border-color: var(--c6);
+    }
+
+    .tab[data-id="adventure"].active {
+      background: #FF9F43;
+      border-color: #FF9F43;
+      color: #111;
+    }
+
+    /* HOME GRID (COMPACT) */
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .home-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1.2rem;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .3s;
+      border: 2px solid transparent;
+    }
+
+    .home-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--c4);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.6rem;
+      font-family: 'Fredoka One', cursive;
+    }
+
+    .home-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: .3rem;
+    }
+
+    .home-desc {
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.2;
+    }
+
+    /* SECTION CARD */
+    .section {
+      display: none;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      animation: fadeIn .35s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      font-family: 'Fredoka One', cursive;
+    }
+
+    .section-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.5rem;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: 600;
+      margin-top: .1rem;
+    }
+
+    /* ANALOGY BOX */
+    .analogy {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 4px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      font-size: .9rem;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    /* FACTS CARDS */
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: .6rem;
+      margin-top: 1.5rem;
+    }
+
+    .fact-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: .6rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .fact-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .fact-title {
+      font-size: .7rem;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .fact-val {
+      font-size: .95rem;
+      font-weight: 900;
+      margin-top: .2rem;
+    }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .btn {
+      padding: .5rem 1rem;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-red {
+      background: var(--c1);
+      color: #fff;
+    }
+
+    .btn-teal {
+      background: var(--c2);
+      color: #fff;
+    }
+
+    .btn-gold {
+      background: var(--c8);
+      color: #333;
+    }
+
+    .btn-purple {
+      background: var(--c4);
+      color: #fff;
+    }
+
+    .btn-pink {
+      background: var(--c5);
+      color: #fff;
+    }
+
+    .btn-cyan {
+      background: var(--c7);
+      color: #fff;
+    }
+
+    .btn-orange {
+      background: #FF9F43;
+      color: #111;
+    }
+
+    .btn-gray {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .btn-blue {
+      background: #0984e3;
+      color: #fff;
+    }
+
+    .btn-info {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: #fff;
+      font-weight: 700;
+      border-radius: 8px;
+    }
+
+    .btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .input-group {
+      display: flex;
+      gap: .4rem;
+      align-items: center;
+    }
+
+    .val-input {
+      width: 60px;
+      padding: .4rem;
+      border-radius: var(--r-sm);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .val-input:focus {
+      outline: none;
+      border-color: var(--c4);
+    }
+
+    /* MESSAGE */
+    .msg {
+      min-height: 36px;
+      padding: .5rem .8rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: var(--r-sm);
+      margin-bottom: 1rem;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--c3);
+      transition: all .3s;
+    }
+
+    /* GLOBAL ALERT MODAL */
+    #adv-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 10, 0.85);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #adv-modal.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .adv-modal-content {
+      background: var(--surface);
+      padding: 2.5rem;
+      border-radius: 20px;
+      border: 3px solid var(--c3);
+      max-width: 500px;
+      text-align: center;
+      transform: scale(0.8);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    #adv-modal.show .adv-modal-content {
+      transform: scale(1);
+    }
+
+    /* HOVER GLOW & CURSOR */
+    .arr-box,
+    .stack-slot,
+    .q-item,
+    .ll-box,
+    .tree-node circle,
+    .heap-node circle {
+      cursor: pointer;
+      transition: all .3s;
+    }
+
+    .arr-box:hover,
+    .stack-slot:hover,
+    .q-item:hover,
+    .ll-box:hover {
+      filter: brightness(1.2);
+      box-shadow: 0 0 15px currentColor;
+      transform: scale(1.05);
+    }
+
+    .tree-node circle:hover,
+    .heap-node circle:hover {
+      filter: drop-shadow(0 0 8px currentColor);
+      stroke-width: 4px;
+    }
+
+    /* ====== ARRAY ====== */
+    #array-vis {
+      display: flex;
+      gap: .6rem;
+      align-items: flex-end;
+      min-height: 100px;
+      flex-wrap: wrap;
+      padding: .5rem 0;
+    }
+
+    .arr-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .3rem;
+      animation: popIn .3s;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .arr-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .arr-box.highlight {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px currentColor;
+    }
+
+    .arr-index {
+      font-size: .7rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .arr-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: .9rem;
+    }
+
+    /* ====== STACK ====== */
+    #stack-vis {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: .4rem;
+      min-height: 220px;
+      justify-content: flex-start;
+      padding: .5rem;
+    }
+
+    .stack-slot {
+      width: 160px;
+      height: 42px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 900;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      animation: popIn .3s;
+      position: relative;
+    }
+
+    .stack-slot.top-label::after {
+      content: '⬅ κορυφή!';
+      position: absolute;
+      right: -75px;
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--c3);
+      white-space: nowrap;
+    }
+
+    .stack-floor {
+      width: 200px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      margin-top: .2rem;
+    }
+
+    .stack-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 160px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* ====== QUEUE ====== */
+    #queue-vis {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      min-height: 80px;
+      overflow-x: auto;
+      padding: .5rem;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .q-item {
+      flex: 0 0 auto;
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 900;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      animation: popIn .3s;
+      position: relative;
+    }
+
+    .q-label {
+      position: absolute;
+      bottom: -18px;
+      font-size: .65rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .q-arrow {
+      font-size: 1.1rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .q-direction {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      font-weight: 800;
+      color: var(--muted);
+      padding: 0 .5rem;
+      margin-top: .5rem;
+    }
+
+    .q-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* ====== LINKED LIST ====== */
+    #ll-vis {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .4rem;
+      padding: .5rem 0;
+      min-height: 80px;
+    }
+
+    .ll-node {
+      display: flex;
+      align-items: center;
+      animation: popIn .3s;
+    }
+
+    .ll-box {
+      display: flex;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .ll-val {
+      padding: .4rem .6rem;
+      font-weight: 900;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .ll-ptr {
+      padding: .4rem .5rem;
+      border-left: 2px solid rgba(255, 255, 255, 0.2);
+      font-size: .8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+    }
+
+    .ll-arrow {
+      font-size: 1.2rem;
+      color: var(--muted);
+      padding: 0 .1rem;
+    }
+
+    .ll-null {
+      padding: .4rem .7rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--muted);
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .ll-head-label {
+      font-size: .7rem;
+      font-weight: 800;
+      color: var(--c4);
+      display: block;
+      text-align: center;
+      margin-bottom: .2rem;
+    }
+
+    .ll-empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* ====== TREE & HEAP ====== */
+    #tree-container,
+    #heap-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #tree-svg,
+    #heap-svg {
+      display: block;
+    }
+
+    .tree-node,
+    .heap-node {
+      cursor: pointer;
+    }
+
+    .tree-node circle,
+    .heap-node circle {
+      transition: all .3s;
+    }
+
+    .tree-node text,
+    .heap-node text {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      fill: #fff;
+      pointer-events: none;
+    }
+
+    .tree-edge {
+      stroke: rgba(255, 255, 255, 0.2);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* DND BLOCKS */
+    .drag-block {
+      width: 40px;
+      height: 40px;
+      background: var(--c6);
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .drag-block:active {
+      cursor: grabbing;
+      transform: scale(1.1);
+    }
+
+    .drop-slot {
+      width: 50px;
+      height: 50px;
+      border: 2px dashed var(--muted);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      transition: background 0.2s;
+    }
+
+    .drop-slot.drag-over {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: var(--c6);
+    }
+
+    .q-btn-active {
+      background: var(--c4);
+      color: #fff;
+      border: 2px solid var(--c4);
+    }
+
+    /* SORT BLOCKS */
+    .sort-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 900;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .sort-box.selected {
+      border-color: #e056fd;
+      background: rgba(224, 86, 253, 0.3);
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(224, 86, 253, 0.5);
+    }
+
+    .sort-box.sorted {
+      border-color: var(--c2);
+      background: rgba(78, 205, 196, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stars"></div>
+
+  <!-- GLOBAL MODAL UI -->
+  <div id="adv-modal">
+    <div class="adv-modal-content">
+      <h2 id="adv-modal-title" style="font-family:'Fredoka One', cursive; margin-bottom:1rem; font-size:2rem;"></h2>
+      <p id="adv-modal-text" style="margin:1rem 0 2rem; font-size:1.2rem; line-height:1.5; color:var(--text);"></p>
+      <div id="adv-modal-btns" style="display:flex; gap:1rem; justify-content:center;">
+        <button class="btn btn-gold" id="adv-modal-btn-1" style="font-size:1.1rem; padding:0.8rem 2rem;">OK</button>
+        <button class="btn btn-gray" id="adv-modal-btn-2"
+          style="font-size:1.1rem; padding:0.8rem 2rem; display:none;">Ακύρωση</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="prompt-modal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,10,0.85); z-index:10000; justify-content:center; align-items:center; opacity:0; transition: opacity 0.3s;">
+    <div class="adv-modal-content"
+      style="background:var(--surface); padding:2.5rem; border-radius:20px; border:3px solid var(--c1); max-width:400px; text-align:center; transform: scale(1);">
+      <h2 id="prompt-modal-title"
+        style="font-family:'Fredoka One', cursive; margin-bottom:1.5rem; font-size:1.6rem; color:var(--text);"></h2>
+      <input type="number" id="prompt-modal-input"
+        style="width:100%; padding:1rem; font-size:1.5rem; border-radius:10px; border:2px solid var(--muted); background:rgba(0,0,0,0.2); color:#fff; text-align:center; margin-bottom:1.5rem;"
+        autocomplete="off">
+      <div style="display:flex; gap:1rem; justify-content:center;">
+        <button class="btn btn-teal" id="prompt-modal-btn-ok" style="font-size:1.1rem; padding:0.8rem 2rem;">OK</button>
+        <button class="btn btn-red" id="prompt-modal-btn-cancel"
+          style="font-size:1.1rem; padding:0.8rem 2rem;">Ακύρωση</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrapper">
+    <div class="header">
+      <h1>Μαθαίνοντας Δομές Δεδομένων!</h1>
+      <p>Ανακάλυψε πώς λειτουργούν οι υπολογιστές, μέσα από παιχνίδι!</p>
+    </div>
+
+    <nav class="nav" id="top-nav" style="display:none;">
+      <button class="tab active" data-id="home" onclick="openTab('home')">Αρχική</button>
+      <button class="tab" data-id="array" onclick="openTab('array')">Πίνακας</button>
+      <button class="tab" data-id="stack" onclick="openTab('stack')">Στοίβα</button>
+      <button class="tab" data-id="queue" onclick="openTab('queue')">Ουρά</button>
+      <button class="tab" data-id="linkedlist" onclick="openTab('linkedlist')">Λίστα</button>
+      <button class="tab" data-id="tree" onclick="openTab('tree')">Δέντρο</button>
+      <button class="tab" data-id="heap" onclick="openTab('heap')">Σωρός</button>
+      <button class="tab" data-id="sort" onclick="openTab('sort')">Ταξινόμηση 🔁</button>
+      <button class="tab" data-id="quiz" onclick="openTab('quiz')">Quiz ❓</button>
+      <button class="tab" data-id="interactive" onclick="openTab('interactive')">Drag & Drop 🧩</button>
+      <button class="tab" data-id="adventure" onclick="openTab('adventure')">Περιπέτεια 🗺️</button>
+    </nav>
+
+    <!-- ===== HOME ===== -->
+    <div class="section active" id="section-home"
+      style="background:transparent; border:none; padding:0; box-shadow:none;">
+      <div style="text-align:center; font-size:1.1rem; color:var(--text); margin-bottom:0.5rem; font-weight: 700;">
+        Επίλεξε τι θέλεις να εξερευνήσεις:</div>
+      <div class="home-grid">
+        <div class="home-card" onclick="openTab('array')">
+          <div class="home-icon" style="color:var(--c1)">A</div>
+          <div class="home-title">Πίνακας</div>
+          <div class="home-desc">Καθίσματα στη σειρά</div>
+        </div>
+        <div class="home-card" onclick="openTab('stack')">
+          <div class="home-icon" style="color:var(--c2)">S</div>
+          <div class="home-title">Στοίβα</div>
+          <div class="home-desc">Μια στοίβα από τηγανίτες</div>
+        </div>
+        <div class="home-card" onclick="openTab('queue')">
+          <div class="home-icon" style="color:var(--c8)">Q</div>
+          <div class="home-title">Ουρά</div>
+          <div class="home-desc">Περιμένω στη σειρά μου</div>
+        </div>
+        <div class="home-card" onclick="openTab('linkedlist')">
+          <div class="home-icon" style="color:var(--c4)">L</div>
+          <div class="home-title">Λίστα</div>
+          <div class="home-desc">Πιάνοντας χέρια σαν αλυσίδα</div>
+        </div>
+        <div class="home-card" onclick="openTab('tree')">
+          <div class="home-icon" style="color:var(--c5)">T</div>
+          <div class="home-title">Δέντρο</div>
+          <div class="home-desc">Μικρά αριστερά, μεγάλα δεξιά</div>
+        </div>
+        <div class="home-card" onclick="openTab('heap')">
+          <div class="home-icon" style="color:var(--c7)">H</div>
+          <div class="home-title">Σωρός</div>
+          <div class="home-desc">Ο πιο δυνατός στην κορυφή</div>
+        </div>
+        <div class="home-card" onclick="openTab('sort')" style="border-color:#e056fd; background:rgba(224,86,253,0.1);">
+          <div class="home-icon" style="color:#e056fd">🔁</div>
+          <div class="home-title">Ταξινόμηση</div>
+          <div class="home-desc">Βάλε τα στη σειρά!</div>
+        </div>
+        <div class="home-card" onclick="openTab('quiz')"
+          style="border-color:var(--c3); background:rgba(255,230,109,0.1);">
+          <div class="home-icon" style="color:var(--c3)">❓</div>
+          <div class="home-title">Quiz Ερωτήσεων</div>
+          <div class="home-desc">Τέσταρε τις γνώσεις σου!</div>
+        </div>
+        <div class="home-card" onclick="openTab('interactive')"
+          style="border-color:var(--c6); background:rgba(108,92,231,0.1);">
+          <div class="home-icon" style="color:var(--c6)">🧩</div>
+          <div class="home-title">Hard Drag & Drop</div>
+          <div class="home-desc">8 δύσκολες αποστολές δόμησης!</div>
+        </div>
+        <div class="home-card" onclick="openTab('adventure')"
+          style="border-color:#FF9F43; background:rgba(255,159,67,0.15); box-shadow:0 0 20px rgba(255,159,67,0.3);">
+          <div class="home-icon" style="color:#FF9F43">🗺️</div>
+          <div class="home-title">Περιπέτεια</div>
+          <div class="home-desc">Λύσε τους 12 γρίφους!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ARRAY ===== -->
+    <div class="section" id="section-array">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FF6B6B33; color:var(--c1)">A</div>
+        <div>
+          <div class="section-title" style="color:var(--c1)">Πίνακας (Array)</div>
+          <div class="section-subtitle">Θέσεις με αριθμούς — όπως καθίσματα (Όριο: 14 θέσεις)</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:var(--c1); color:var(--text);"><strong>Φαντάσου…</strong> Έχεις μια σειρά
+        καθισμάτων στον κινηματογράφο. Κάθε κάθισμα έχει τον αριθμό του (0, 1, 2…). Μπορείς να πας κατευθείαν στο
+        κάθισμα 5!</div>
+      <div class="controls">
+        <div class="input-group"><input class="val-input" id="arr-input" type="number" value=""><button
+            class="btn btn-red" onclick="arrAdd()">Προσθήκη</button></div>
+        <button class="btn btn-gray" onclick="arrRemoveLast()">Αφαίρεση τελευταίου</button>
+        <div class="input-group"><input class="val-input" id="arr-search" type="number" placeholder="αναζ."><button
+            class="btn btn-gold" onclick="arrSearch()">Αναζήτηση</button></div>
+        <button class="btn btn-gray" onclick="arrReset()">Επαναφορά</button>
+      </div>
+      <div class="msg" id="arr-msg">Πάτα «Προσθήκη» για να βάλεις τιμές!</div>
+      <div id="array-vis"></div>
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Πρόσβαση', 'O(1) Στιγμιαία! Επειδή ξέρουμε ακριβώς τη θέση (index), πάμε κατευθείαν εκεί χωρίς να ψάξουμε!')">
+          <div class="fact-title">Πρόσβαση</div>
+          <div class="fact-val" style="color:var(--c1)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Αναζήτηση', 'O(n) Γραμμική! Αν δεν ξέρουμε τη θέση, πρέπει να ψάξουμε ένα-ένα όλα τα στοιχεία από την αρχή μέχρι να το βρούμε.')">
+          <div class="fact-title">Αναζήτηση</div>
+          <div class="fact-val" style="color:var(--c1)">O(n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Εισαγωγή', 'O(n) Γραμμική! Αν βάλουμε κάτι στη μέση, πρέπει να σπρώξουμε όλα τα επόμενα στοιχεία μια θέση δεξιά.')">
+          <div class="fact-title">Εισαγωγή</div>
+          <div class="fact-val" style="color:var(--c1)">O(n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Χρήση', 'Χρησιμοποιείται σε λίστες επιλογών, βαθμολογίες (scores), εικόνες και οπουδήποτε θέλουμε γρήγορη πρόσβαση σε στοιχεία με τη σειρά.')">
+          <div class="fact-title">Χρήση</div>
+          <div class="fact-val" style="font-size:0.85rem">Scores, Λίστες</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STACK ===== -->
+    <div class="section" id="section-stack">
+      <div class="section-header">
+        <div class="section-icon" style="background:#4ECDC433; color:var(--c2)">S</div>
+        <div>
+          <div class="section-title" style="color:var(--c2)">Στοίβα (Stack)</div>
+          <div class="section-subtitle">Τελευταίος μπαίνει, πρώτος βγαίνει — LIFO!</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:var(--c2); color:var(--text);"><strong>Φαντάσου…</strong> Μια στοίβα από
+        τηγανίτες! Βάζεις στην κορυφή και τρως από την κορυφή.</div>
+      <div class="controls">
+        <div class="input-group"><input class="val-input" id="stack-input" type="number" value=""><button
+            class="btn btn-teal" onclick="stackPush()">Push (Βάλε)</button></div>
+        <button class="btn btn-red" onclick="stackPop()" id="stack-pop-btn">Pop (Πάρε)</button>
+        <button class="btn btn-gold" onclick="stackPeek()" id="stack-peek-btn">Peek (Κοίτα)</button>
+        <button class="btn btn-gray" onclick="stackReset()">Καθάρισμα</button>
+      </div>
+      <div class="msg" id="stack-msg">Πάτα «Push» για να βάλεις τηγανίτα!</div>
+      <div style="display:flex; justify-content:center;">
+        <div id="stack-vis"></div>
+      </div>
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Push (Εισαγωγή)', 'O(1) Στιγμιαία! Βάζουμε το νέο στοιχείο κατευθείαν στην κορυφή της στοίβας χωρίς να μετακινήσουμε τίποτα άλλο.')">
+          <div class="fact-title">Push</div>
+          <div class="fact-val" style="color:var(--c2)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Pop (Εξαγωγή)', 'O(1) Στιγμιαία! Βγάζουμε κατευθείαν το στοιχείο που βρίσκεται στην κορυφή της στοίβας.')">
+          <div class="fact-title">Pop</div>
+          <div class="fact-val" style="color:var(--c2)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Peek (Προβολή)', 'O(1) Στιγμιαία! Απλά κοιτάμε ποιο είναι το πάνω-πάνω στοιχείο χωρίς να το αφαιρέσουμε.')">
+          <div class="fact-title">Peek</div>
+          <div class="fact-val" style="color:var(--c2)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Χρήση', 'Χρησιμοποιείται στην αναίρεση (Undo), στο κουμπί Πίσω (Back) του Browser και στη μνήμη του υπολογιστή (Call Stack)!')">
+          <div class="fact-title">Χρήση</div>
+          <div class="fact-val" style="font-size:0.85rem">Undo, Browser</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUEUE ===== -->
+    <div class="section" id="section-queue">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FDCB6E33; color:var(--c8)">Q</div>
+        <div>
+          <div class="section-title" style="color:var(--c8)">Ουρά (Queue)</div>
+          <div class="section-subtitle">Πρώτος μπαίνει, πρώτος βγαίνει — FIFO!</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:var(--c8); color:var(--text);"><strong>Φαντάσου…</strong> Μια ουρά σε
+        ΑΤΜ! Αυτός που ήρθε πρώτος εξυπηρετείται πρώτος.</div>
+      <div class="controls">
+        <div class="input-group"><input class="val-input" id="q-input" type="number" value=""><button
+            class="btn btn-gold" onclick="qEnqueue()">Enqueue (Μπες)</button></div>
+        <button class="btn btn-red" onclick="qDequeue()" id="q-deq-btn">Dequeue (Βγες)</button>
+        <button class="btn btn-gray" onclick="qReset()">Καθάρισμα</button>
+      </div>
+      <div class="msg" id="q-msg">Πάτα «Enqueue» για να μπεις στην ουρά!</div>
+      <div id="queue-vis"></div>
+      <div class="q-direction" id="q-dir" style="display:none"><span>← Βγαίνει (front)</span><span>Μπαίνει (rear)
+          →</span></div>
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Enqueue (Μπαίνει)', 'O(1) Στιγμιαία! Το νέο στοιχείο μπαίνει κατευθείαν στο τέλος (rear) της ουράς.')">
+          <div class="fact-title">Enqueue</div>
+          <div class="fact-val" style="color:var(--c8)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Dequeue (Βγαίνει)', 'O(1) Στιγμιαία! Αυτός που είναι πρώτος στην ουρά (front), εξυπηρετείται και βγαίνει.')">
+          <div class="fact-title">Dequeue</div>
+          <div class="fact-val" style="color:var(--c8)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Κανόνας FIFO', 'FIFO σημαίνει First-In, First-Out: Ο πρώτος που μπήκε στην ουρά, θα είναι και ο πρώτος που θα βγει!')">
+          <div class="fact-title">Κανόνας</div>
+          <div class="fact-val" style="color:var(--c8)">FIFO</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Χρήση', 'Χρησιμοποιείται στους εκτυπωτές (ουρά εκτύπωσης), στην εξυπηρέτηση πελατών και στα προγράμματα του υπολογιστή που περιμένουν να τρέξουν.')">
+          <div class="fact-title">Χρήση</div>
+          <div class="fact-val" style="font-size:0.85rem">Εκτυπωτές, Tasks</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LINKED LIST ===== -->
+    <div class="section" id="section-linkedlist">
+      <div class="section-header">
+        <div class="section-icon" style="background:#A29BFE33; color:var(--c4)">L</div>
+        <div>
+          <div class="section-title" style="color:var(--c4)">Συνδεδεμένη Λίστα</div>
+          <div class="section-subtitle">Κόμβοι συνδεδεμένοι με βέλη — σαν αλυσίδα!</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:var(--c4); color:var(--text);"><strong>Φαντάσου…</strong> Μια ομάδα
+        ανθρώπων που ο καθένας κρατά το χέρι του επόμενου.</div>
+      <div class="controls">
+        <div class="input-group"><input class="val-input" id="ll-input" type="number" value=""><button
+            class="btn btn-purple" onclick="llPrepend()">Στην αρχή</button><button class="btn btn-teal"
+            onclick="llAppend()">Στο τέλος</button></div>
+        <button class="btn btn-red" onclick="llRemoveFirst()" id="ll-rem-btn">Αφαίρεση πρώτου</button>
+        <button class="btn btn-gray" onclick="llReset()">Καθάρισμα</button>
+      </div>
+      <div class="msg" id="ll-msg">Πάτα «Στην αρχή» ή «Στο τέλος» για προσθήκη!</div>
+      <div id="ll-vis"></div>
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Εισαγωγή', 'O(1) Στιγμιαία! Αν ξέρουμε πού θα το βάλουμε, απλά αλλάζουμε τα βελάκια (pointers) για να δείχνουν στον νέο κόμβο χωρίς να σπρώξουμε τους άλλους!')">
+          <div class="fact-title">Εισαγωγή</div>
+          <div class="fact-val" style="color:var(--c4)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Αναζήτηση', 'O(n) Γραμμική! Πρέπει να ακολουθήσουμε τα βελάκια από τον πρώτο κόμβο (Head) ένα-ένα μέχρι να βρούμε αυτό που ψάχνουμε.')">
+          <div class="fact-title">Αναζήτηση</div>
+          <div class="fact-val" style="color:var(--c4)">O(n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Δυναμική Μνήμη', 'Σε αντίθεση με τον πίνακα, δεν χρειάζεται να ξέρουμε από πριν το μέγεθος. Η λίστα μεγαλώνει δυναμικά όσο προσθέτουμε κόμβους!')">
+          <div class="fact-title">Μνήμη</div>
+          <div class="fact-val" style="font-size:0.9rem; color:var(--c4)">Δυναμική</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Χρήση', 'Χρησιμοποιείται στα Playlists τραγουδιών (κουμπί επόμενο/προηγούμενο) και στην προβολή εικόνων.')">
+          <div class="fact-title">Χρήση</div>
+          <div class="fact-val" style="font-size:0.85rem">Music Player</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TREE ===== -->
+    <div class="section" id="section-tree">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FD79A833; color:var(--c5)">T</div>
+        <div>
+          <div class="section-title" style="color:var(--c5)">Δυαδικό Δέντρο Αναζήτησης</div>
+          <div class="section-subtitle">Αριστερά μικρότερα, δεξιά μεγαλύτερα!</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:var(--c5); color:var(--text);"><strong>Φαντάσου…</strong> Ένα παιχνίδι
+        «μεγαλύτερο ή μικρότερο».</div>
+      <div class="controls">
+        <div class="input-group"><input class="val-input" id="tree-input" type="number" value="" min="1"
+            max="99"><button class="btn btn-pink" onclick="treeInsert()">Εισαγωγή</button></div>
+        <div class="input-group"><input class="val-input" id="tree-search" type="number" placeholder="αναζ." min="1"
+            max="99"><button class="btn btn-gold" onclick="treeSearch()">Αναζήτηση</button></div>
+        <button class="btn btn-gray" onclick="treeReset()">Καθάρισμα</button>
+        <button class="btn btn-gray" onclick="treeFillDemo()">Demo</button>
+      </div>
+      <div class="msg" id="tree-msg">Πάτα «Demo» για να δεις ένα δέντρο!</div>
+      <div id="tree-container"><svg id="tree-svg" height="280"></svg></div>
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Αναζήτηση', 'O(log n) Λογαριθμική! Είναι πολύ γρήγορο γιατί σε κάθε βήμα κόβουμε τα μισά στοιχεία, επιλέγοντας αν θα πάμε αριστερά ή δεξιά!')">
+          <div class="fact-title">Αναζήτηση</div>
+          <div class="fact-val" style="color:var(--c5)">O(log n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Εισαγωγή', 'O(log n) Λογαριθμική! Κατεβαίνουμε γρήγορα στο δέντρο επιλέγοντας αριστερά ή δεξιά, μέχρι να βρούμε την κατάλληλη κενή θέση.')">
+          <div class="fact-title">Εισαγωγή</div>
+          <div class="fact-val" style="color:var(--c5)">O(log n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Δυαδικό Δέντρο Αναζήτησης (BST)', 'BST σημαίνει Binary Search Tree. Ο κανόνας του είναι: Όλα τα μικρότερα παιδιά πάνε αριστερά, όλα τα μεγαλύτερα παιδιά πάνε δεξιά!')">
+          <div class="fact-title">Τύπος</div>
+          <div class="fact-val" style="font-size:0.9rem; color:var(--c5)">BST</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Χρήση', 'Χρησιμοποιείται στις Βάσεις Δεδομένων, στα λεξικά και οπουδήποτε θέλουμε να αποθηκεύσουμε στοιχεία ταξινομημένα για έξυπνη και γρήγορη αναζήτηση!')">
+          <div class="fact-title">Χρήση</div>
+          <div class="fact-val" style="font-size:0.85rem">Βάσεις Δεδομένων</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HEAP ===== -->
+    <div class="section" id="section-heap">
+      <div class="section-header">
+        <div class="section-icon" style="background:#00CEC933; color:var(--c7)">H</div>
+        <div>
+          <div class="section-title" style="color:var(--c7)">Σωρός (Max-Heap)</div>
+          <div class="section-subtitle">Το μεγαλύτερο βρίσκεται πάντα στην κορυφή!</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:var(--c7); color:var(--text);"><strong>Φαντάσου…</strong> Μια πυραμίδα
+        όπου ο πιο δυνατός (μεγαλύτερος) κάθεται πάντα στην κορυφή.</div>
+      <div class="controls">
+        <div class="input-group"><input class="val-input" id="heap-input" type="number" value="" min="1"
+            max="99"><button class="btn btn-cyan" onclick="heapInsert()">Εισαγωγή</button></div>
+        <button class="btn btn-red" onclick="heapExtractMax()">Εξαγωγή Μεγίστου</button>
+        <button class="btn btn-gray" onclick="heapReset()">Καθάρισμα</button>
+      </div>
+      <div class="msg" id="heap-msg">Πρόσθεσε αριθμούς για να χτίσεις τον Σωρό!</div>
+      <div id="heap-container"><svg id="heap-svg" height="280"></svg></div>
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Εύρεση Max', 'O(1) Στιγμιαία! Το μεγαλύτερο στοιχείο είναι πάντα, μα πάντα, στη Ρίζα (στην κορυφή του δέντρου)!')">
+          <div class="fact-title">Εύρεση Max</div>
+          <div class="fact-val" style="color:var(--c7)">O(1)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Εισαγωγή', 'O(log n) Λογαριθμική! Το βάζουμε στο τέλος και το «ανεβάζουμε» (Heapify Up) αν είναι μεγαλύτερο από τον γονιό του.')">
+          <div class="fact-title">Εισαγωγή</div>
+          <div class="fact-val" style="color:var(--c7)">O(log n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Εξαγωγή', 'O(log n) Λογαριθμική! Βγάζουμε την κορυφή, βάζουμε το τελευταίο στοιχείο στην κορυφή και το «κατεβάζουμε» (Heapify Down) στη σωστή του θέση.')">
+          <div class="fact-title">Εξαγωγή</div>
+          <div class="fact-val" style="color:var(--c7)">O(log n)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Χρήση', 'Χρησιμοποιείται στις Ουρές Προτεραιότητας (Priority Queues), π.χ. στο νοσοκομείο όπου ο πιο επείγον ασθενής έχει μεγαλύτερη προτεραιότητα ανεξάρτητα από το πότε ήρθε.')">
+          <div class="fact-title">Χρήση</div>
+          <div class="fact-val" style="font-size:0.85rem">Ουρές Προτεραιότητας</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== QUIZ ===== -->
+    <div class="section" id="section-quiz">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FFE66D33; color:var(--c3)">❓</div>
+        <div>
+          <div class="section-title" style="color:var(--c3)">Quiz Γνώσεων</div>
+          <div class="section-subtitle">Απάντησε σωστά και κέρδισε πόντους!</div>
+        </div>
+      </div>
+      <div id="quiz-container"
+        style="background:rgba(255,255,255,0.05); padding:2rem; border-radius:15px; min-height: 200px; text-align:center;">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- ===== SORTING ===== -->
+    <div class="section" id="section-sort">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(224,86,253,0.2); color:#e056fd">🔁</div>
+        <div>
+          <div class="section-title" style="color:#e056fd">Αλγόριθμοι Ταξινόμησης (Sorting)</div>
+          <div class="section-subtitle">Βάλε τους αριθμούς στη σωστή σειρά (από το μικρότερο στο μεγαλύτερο)!</div>
+        </div>
+      </div>
+      <div class="analogy" style="border-color:#e056fd; color:var(--text);"><strong>Φαντάσου…</strong> Προσπαθείς να
+        βάλεις τα βιβλία σου στο ράφι κατά μέγεθος. Κάνε κλικ σε <strong>δύο</strong> αριθμούς για να τους ανταλλάξεις
+        (Swap)!</div>
+
+      <div
+        style="background:rgba(0,0,0,0.3); padding:1.5rem; border-radius:12px; border:2px solid #e056fd; margin-bottom:1.5rem; text-align:center;">
+        <h3 id="sort-title" style="color:#e056fd; margin-bottom:1rem; font-size:1.3rem;">Bubble Sort (Ταξινόμηση
+          Φυσαλίδας)</h3>
+        <p id="sort-desc" style="color:var(--text); font-size:1rem; margin-bottom:1.5rem;">Αντάλλαξε γειτονικούς
+          αριθμούς μέχρι να ταξινομηθούν όλοι!</p>
+
+        <div id="sort-vis"
+          style="display:flex; justify-content:center; gap:0.8rem; margin-bottom:1.5rem; min-height:60px;">
+          <!-- Injected by JS -->
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:1rem;">
+          <button class="btn btn-gray" onclick="initSort('bubble')">Bubble Sort</button>
+          <button class="btn btn-gray" onclick="initSort('insertion')">Insertion Sort</button>
+          <button class="btn btn-purple" style="background:#e056fd;" onclick="checkSort()">Έλεγχος Ταξινόμησης</button>
+        </div>
+        <div id="sort-msg" style="margin-top:1rem; min-height:24px; font-weight:bold; color:var(--c3);"></div>
+      </div>
+
+      <div class="facts">
+        <div class="fact-card"
+          onclick="showInfo('Bubble Sort', 'O(n²) - Συγκρίνει ζευγάρια δίπλα-δίπλα. Τα μεγάλα στοιχεία «ανεβαίνουν» σαν φυσαλίδες στο τέλος.')">
+          <div class="fact-title">Bubble</div>
+          <div class="fact-val" style="color:#e056fd">O(n²)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Insertion Sort', 'O(n²) - Παίρνει ένα-ένα στοιχείο και το βάζει στη σωστή θέση ανάμεσα στα προηγούμενα, σαν να ταξινομείς τράπουλα.')">
+          <div class="fact-title">Insertion</div>
+          <div class="fact-val" style="color:#e056fd">O(n²)</div>
+        </div>
+        <div class="fact-card"
+          onclick="showInfo('Quick Sort', 'O(n log n) - Διαλέγει έναν «αρχηγό» (pivot) και χωρίζει τα μικρά αριστερά, μεγάλα δεξιά. Πολύ γρήγορο!')">
+          <div class="fact-title">Quick Sort</div>
+          <div class="fact-val" style="color:#e056fd">O(n log n)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== INTERACTIVE GAME (DND) ===== -->
+    <div class="section" id="section-interactive">
+      <div class="section-header">
+        <div class="section-icon" style="background:#6C5CE733; color:var(--c6)">🧩</div>
+        <div>
+          <div class="section-title" style="color:var(--c6)">Δύσκολες Αποστολές Drag & Drop</div>
+          <div class="section-subtitle">Σύρε τα τουβλάκια από τη δεξαμενή στις σωστές θέσεις!</div>
+        </div>
+      </div>
+
+      <!-- Lobby View -->
+      <div id="dnd-lobby-view"
+        style="display:none; background:rgba(0,0,0,0.2); padding:2rem; border-radius:15px; border:2px solid var(--c6);">
+      </div>
+
+      <!-- Game View -->
+      <div id="dnd-game-view">
+        <div
+          style="background:rgba(0,0,0,0.3); padding:1.5rem; border-radius:12px; border:2px solid var(--c6); margin-bottom:1.5rem;">
+          <h3 id="dnd-mission-title" style="color:var(--c6); margin-bottom:0.5rem; font-size:1.4rem;"></h3>
+          <p id="dnd-mission-desc" style="color:var(--text); font-size:1.1rem; line-height:1.5;"></p>
+        </div>
+        <div style="display:flex; gap:1.5rem; flex-wrap:wrap; justify-content:center; align-items:flex-start;">
+          <!-- Pool -->
+          <div
+            style="background:rgba(0,0,0,0.2); padding:1rem; border-radius:12px; border:2px dashed var(--muted); min-width:200px; min-height:120px;">
+            <div style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem; font-weight:800; text-align:center;">
+              Δεξαμενή</div>
+            <div id="drag-pool"
+              style="display:flex; gap:0.8rem; flex-wrap:wrap; justify-content:center; min-height:50px;"
+              ondragover="dOver(event)" ondrop="dDropPool(event)"></div>
+          </div>
+          <!-- Construction Vis -->
+          <div id="mission-drop-container"
+            style="background:rgba(0,0,0,0.2); padding:1.5rem; border-radius:12px; border:2px dashed var(--c6); flex-grow:1; display:flex; flex-direction:column; align-items:center; min-height:150px;">
+            <div style="font-size:1rem; color:var(--c6); margin-bottom:1rem; font-weight:800; text-align:center;">
+              Κατασκευή</div>
+            <div id="mission-vis"
+              style="display:flex; justify-content:center; align-items:center; gap:1rem; width:100%;">
+            </div>
+            <div id="dnd-action-btn" style="margin-top:1rem; display:none;">
+              <button id="btn-stack-pop" class="btn btn-teal" style="touch-action:auto;" onclick="dndStackPop()">Pop
+                (Βγάλε από Κορυφή)</button>
+              <button id="btn-queue-dequeue" class="btn btn-gold" style="touch-action:auto; display:none;"
+                onclick="queueDequeue()">Dequeue (Εξαγωγή από Έξοδο)</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:2rem;">
+          <div id="dnd-msg"
+            style="margin:0 auto; padding:1rem; font-size:1.2rem; font-weight:bold; min-height:40px; border-radius:8px; margin-bottom:1.5rem;">
+          </div>
+          <button class="btn btn-red" onclick="currDND=-1; initDND();" style="margin-top:1rem;">⬅️ Επιστροφή στον
+            Προθάλαμο</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ADVENTURE MODE ===== -->
+    <div class="section" id="section-adventure">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FF9F4333; color:#FF9F43">🗺️</div>
+        <div>
+          <div class="section-title" style="color:#FF9F43">Παιχνίδι Περιπέτειας (12 Επίπεδα)</div>
+          <div class="section-subtitle">Λύσε τους γρίφους των αλγορίθμων!</div>
+        </div>
+      </div>
+      <div id="adventure-vis"
+        style="background:rgba(0,0,0,0.2); padding:1.5rem; border-radius:12px; border:2px solid #FF9F43;">
+        <!-- Content injected by JS -->
+      </div>
+    </div>
+
+  </div><!-- end wrapper -->
+
+  <script>
+    // ======== TAB NAVIGATION & UTIL ========
+    let adv7_int = null;
+
+    function openTab(id) {
+      if (adv7_int) { clearInterval(adv7_int); adv7_int = null; }
+
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+      const tabBtn = document.querySelector(`.tab[data-id="${id}"]`);
+      if (tabBtn) tabBtn.classList.add('active');
+      const section = document.getElementById('section-' + id);
+      if (section) section.classList.add('active');
+
+      document.getElementById('top-nav').style.display = (id === 'home') ? 'none' : 'flex';
+
+      if (id === 'quiz') { currentQuizQ = 0; quizScore = 0; renderQuiz(); }
+      if (id === 'sort') { initSort('bubble'); }
+      if (id === 'interactive') { currDND = -1; initDND(); }
+      if (id === 'adventure') { initAdventure(); }
+    }
+
+    function showModal(title, text, btn1Text, btn1Action, btn2Text = null, btn2Action = null) {
+      const m = document.getElementById('adv-modal');
+      document.getElementById('adv-modal-title').innerHTML = title;
+      document.getElementById('adv-modal-text').innerHTML = text;
+      const b1 = document.getElementById('adv-modal-btn-1');
+      b1.innerText = btn1Text || 'OK';
+      b1.onclick = () => { m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); if (btn1Action) btn1Action(); };
+      const b2 = document.getElementById('adv-modal-btn-2');
+      if (btn2Text) {
+        b2.style.display = 'block'; b2.innerText = btn2Text;
+        b2.onclick = () => { m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); if (btn2Action) btn2Action(); };
+      } else { b2.style.display = 'none'; }
+      m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10);
+    }
+
+    function setMsg(id, text) { const el = document.getElementById(id); el.textContent = text; el.style.color = 'var(--c3)'; }
+
+    function showInfo(title, text) {
+      showModal('💡 ' + title, text, 'Εντάξει!', null);
+    }
+
+    function getValOrRandom(id) {
+      let valStr = document.getElementById(id).value;
+      if (!valStr || valStr.trim() === '') return Math.floor(Math.random() * 99) + 1;
+      return parseInt(valStr);
+    }
+
+    function showPrompt(title, defaultVal, callback) {
+      const m = document.getElementById('prompt-modal');
+      document.getElementById('prompt-modal-title').innerHTML = title;
+      const input = document.getElementById('prompt-modal-input');
+      input.value = defaultVal;
+      const okBtn = document.getElementById('prompt-modal-btn-ok');
+      const cancelBtn = document.getElementById('prompt-modal-btn-cancel');
+      const close = () => { m.style.opacity = '0'; setTimeout(() => { m.style.display = 'none'; }, 300); okBtn.onclick = null; cancelBtn.onclick = null; input.onkeydown = null; };
+      okBtn.onclick = () => { const val = input.value; close(); callback(val); };
+      cancelBtn.onclick = () => { close(); callback(null); };
+      input.onkeydown = (e) => { if (e.key === 'Enter') okBtn.click(); if (e.key === 'Escape') cancelBtn.click(); };
+      m.style.display = 'flex';
+      setTimeout(() => { m.style.opacity = '1'; input.focus(); input.select(); }, 10);
+    }
+
+    // ======== DATA STRUCTURE VISUALIZERS ========
+    const COLORS_ARR = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#A29BFE', '#FD79A8', '#6C5CE7', '#00CEC9', '#FDCB6E'];
+    let arrData = [12, 7, 34, 5, 89];
+    function arrRender() {
+      const vis = document.getElementById('array-vis');
+      if (!arrData.length) { vis.innerHTML = '<div class="arr-empty">Ο πίνακας είναι άδειος!</div>'; return; }
+      vis.innerHTML = arrData.map((v, i) => `<div class="arr-cell" id="arr-cell-${i}"><div class="arr-box" style="background:${COLORS_ARR[i % COLORS_ARR.length]}22; color:${COLORS_ARR[i % COLORS_ARR.length]}; border-color:${COLORS_ARR[i % COLORS_ARR.length]}66;" onclick="arrEdit(${i})">${v}</div><div class="arr-index">[${i}]</div></div>`).join('');
+    }
+    function arrEdit(idx) {
+      showPrompt(`Εισάγετε νέα τιμή για τη θέση [${idx}]:`, arrData[idx], (newVal) => {
+        if (newVal !== null) { const v = parseInt(newVal); if (!isNaN(v)) { arrData[idx] = v; arrRender(); setMsg('arr-msg', `Η θέση [${idx}] ενημερώθηκε σε ${v}!`); } }
+      });
+    }
+    function arrAdd() { const v = getValOrRandom('arr-input'); if (isNaN(v)) return; if (arrData.length >= 14) { showModal('Όριο Πίνακα', 'Ο πίνακας χωράει το πολύ 14 στοιχεία!', 'ΟΚ', null); return; } arrData.push(v); setMsg('arr-msg', `Πρόσθεσα το ${v}!`); arrRender(); }
+    function arrRemoveLast() { if (!arrData.length) return; const r = arrData.pop(); setMsg('arr-msg', `Αφαίρεσα το ${r}!`); arrRender(); }
+    function arrSearch() {
+      const v = parseInt(document.getElementById('arr-search').value); if (isNaN(v)) return;
+      const idx = arrData.indexOf(v); document.querySelectorAll('.arr-box').forEach(b => b.classList.remove('highlight'));
+      if (idx === -1) setMsg('arr-msg', `Το ${v} δεν βρέθηκε!`);
+      else { const box = document.querySelector(`#arr-cell-${idx} .arr-box`); if (box) { box.classList.add('highlight'); setTimeout(() => box.classList.remove('highlight'), 2000); } setMsg('arr-msg', `Βρήκα το ${v} στη θέση [${idx}]!`); }
+    }
+    function arrReset() { arrData = []; arrRender(); setMsg('arr-msg', 'Καθαρίστηκε!'); }
+    arrRender();
+
+    let stackData = []; const COLORS_ST = ['#4ECDC4', '#00CEC9', '#6C5CE7', '#A29BFE', '#FD79A8'];
+    function stackRender() {
+      const vis = document.getElementById('stack-vis');
+      document.getElementById('stack-pop-btn').disabled = !stackData.length; document.getElementById('stack-peek-btn').disabled = !stackData.length;
+      if (!stackData.length) { vis.innerHTML = '<div class="stack-empty">Δεν υπάρχουν στοιχεία!</div><div class="stack-floor"></div>'; return; }
+      vis.innerHTML = `<div class="stack-floor"></div>` + stackData.map((v, i) => `<div class="stack-slot ${i === stackData.length - 1 ? 'top-label' : ''}" style="background:${COLORS_ST[i % COLORS_ST.length]}22; color:${COLORS_ST[i % COLORS_ST.length]}; border-color:${COLORS_ST[i % COLORS_ST.length]}66; cursor:pointer;" onclick="stackEdit(${i})">${v}</div>`).join('');
+    }
+    function stackEdit(idx) {
+      if (idx !== stackData.length - 1) { showModal('Κλειδωμένο!', 'Στη Στοίβα (LIFO) έχεις πρόσβαση ΜΟΝΟ στο πάνω-πάνω στοιχείο! Πρέπει να κάνεις Pop τα από πάνω πρώτα.', 'ΟΚ', null); return; }
+      showPrompt(`Εισάγετε νέα τιμή για την κορυφή της στοίβας:`, stackData[idx], (newVal) => {
+        if (newVal !== null) { const v = parseInt(newVal); if (!isNaN(v)) { stackData[idx] = v; stackRender(); setMsg('stack-msg', `Η κορυφή ενημερώθηκε σε ${v}!`); } }
+      });
+    }
+    function stackPush() { const v = getValOrRandom('stack-input'); if (!isNaN(v) && stackData.length < 12) { stackData.push(v); stackRender(); } }
+    function stackPop() { if (stackData.length) { stackData.pop(); stackRender(); } }
+    function stackPeek() { if (stackData.length) setMsg('stack-msg', `Στην κορυφή είναι το ${stackData[stackData.length - 1]}!`); }
+    function stackReset() { stackData = []; stackRender(); }
+    stackRender();
+
+    let qData = []; const COLORS_Q = ['#FDCB6E', '#FF6B6B', '#4ECDC4', '#A29BFE', '#FD79A8', '#6C5CE7'];
+    let qTraversalIndex = 0;
+    function qRender() {
+      const vis = document.getElementById('queue-vis'); const dir = document.getElementById('q-dir');
+      document.getElementById('q-deq-btn').disabled = !qData.length;
+      if (!qData.length) { vis.innerHTML = '<div class="q-empty">Κανείς δεν περιμένει!</div>'; dir.style.display = 'none'; return; }
+      dir.style.display = 'flex';
+      vis.innerHTML = `<div style="display:flex;gap:.5rem;align-items:center;padding:.5rem;overflow-x:auto;">` + qData.map((v, i) => {
+        const isFirst = i === 0, isLast = i === qData.length - 1; const lbl = isFirst && isLast ? 'front & rear' : isFirst ? 'front' : isLast ? 'rear' : '';
+        const isUnlocked = i < qTraversalIndex;
+        const borderStyle = isUnlocked ? `border: 3px solid #fff; box-shadow: 0 0 10px #fff;` : `border-color:${COLORS_Q[i % COLORS_Q.length]}66;`;
+        return `<div class="q-item" style="background:${COLORS_Q[i % COLORS_Q.length]}22;color:${COLORS_Q[i % COLORS_Q.length]};${borderStyle} cursor:pointer;" onclick="qEdit(${i})">${v}${lbl ? `<span class="q-label" style="color:${COLORS_Q[i % COLORS_Q.length]}">${lbl}</span>` : ''}</div>${i < qData.length - 1 ? '<span class="q-arrow">→</span>' : ''}`;
+      }).join('') + '</div>';
+    }
+    function qEdit(idx) {
+      if (idx > qTraversalIndex) { showModal('Κλειδωμένο!', 'Στην Ουρά (FIFO) η προσπέλαση γίνεται αυστηρά από την αρχή (front) προς το τέλος! Κάνε κλικ στο προηγούμενο στοιχείο για να φτάσεις εδώ.', 'ΟΚ', null); }
+      else if (idx === qTraversalIndex) { qTraversalIndex++; qRender(); setMsg('q-msg', `Προσπέλασες τη θέση ${idx}. Ξανά-κάνε κλικ για επεξεργασία!`); }
+      else {
+        showPrompt(`Εισάγετε νέα τιμή για τη θέση ${idx}:`, qData[idx], (newVal) => {
+          if (newVal !== null) { const v = parseInt(newVal); if (!isNaN(v)) { qData[idx] = v; qTraversalIndex = 0; qRender(); setMsg('q-msg', `Η τιμή ενημερώθηκε. Η διαδρομή επαναφέρθηκε.`); } }
+        });
+      }
+    }
+    function qEnqueue() { const v = getValOrRandom('q-input'); if (!isNaN(v)) { qData.push(v); qTraversalIndex = 0; qRender(); } }
+    function qDequeue() { if (qData.length) { qData.shift(); qTraversalIndex = 0; qRender(); } }
+    function qReset() { qData = []; qTraversalIndex = 0; qRender(); }
+    qRender();
+
+    let llData = []; const COLORS_LL = ['#A29BFE', '#6C5CE7', '#FD79A8', '#4ECDC4', '#FF6B6B', '#FDCB6E'];
+    let llTraversalIndex = 0;
+    function llRender() {
+      const vis = document.getElementById('ll-vis'); document.getElementById('ll-rem-btn').disabled = !llData.length;
+      if (!llData.length) { vis.innerHTML = '<div class="ll-empty">Κανένας κόμβος!</div>'; return; }
+      vis.innerHTML = llData.map((v, i) => {
+        const c = COLORS_LL[i % COLORS_LL.length]; const isHead = i === 0;
+        const isUnlocked = i < llTraversalIndex;
+        const borderStyle = isUnlocked ? `border: 3px solid #fff; box-shadow: 0 0 10px #fff;` : `border-color:${c}66;`;
+        return `<div class="ll-node"><div style="display:flex;flex-direction:column;align-items:center;">${isHead ? '<span class="ll-head-label">HEAD</span>' : ''}<div class="ll-box" style="${borderStyle} cursor:pointer;" onclick="llEdit(${i})"><div class="ll-val" style="background:${c}22;color:${c}">${v}</div><div class="ll-ptr" style="border-color:${c}44;">→</div></div></div>${i < llData.length - 1 ? '<span class="ll-arrow">→</span>' : '<span class="ll-arrow">→</span><div class="ll-null">NULL</div>'}</div>`;
+      }).join('');
+    }
+    function llEdit(idx) {
+      if (idx > llTraversalIndex) { showModal('Κλειδωμένο!', 'Στη Συνδεδεμένη Λίστα δεν υπάρχει τυχαία προσπέλαση! Ξεκίνα από το HEAD και κάνε κλικ διαδοχικά στους κόμβους μέχρι να φτάσεις στον στόχο σου.', 'ΟΚ', null); }
+      else if (idx === llTraversalIndex) { llTraversalIndex++; llRender(); setMsg('ll-msg', `Προσπέλασες τον κόμβο ${idx}. Ξανά-κάνε κλικ για επεξεργασία!`); }
+      else {
+        showPrompt(`Εισάγετε νέα τιμή για τον κόμβο ${idx}:`, llData[idx], (newVal) => {
+          if (newVal !== null) { const v = parseInt(newVal); if (!isNaN(v)) { llData[idx] = v; llTraversalIndex = 0; llRender(); setMsg('ll-msg', `Ο κόμβος ενημερώθηκε. Η διαδρομή επαναφέρθηκε.`); } }
+        });
+      }
+    }
+    function llAppend() { const v = getValOrRandom('ll-input'); if (!isNaN(v)) { llData.push(v); llTraversalIndex = 0; llRender(); } }
+    function llPrepend() { const v = getValOrRandom('ll-input'); if (!isNaN(v)) { llData.unshift(v); llTraversalIndex = 0; llRender(); } }
+    function llRemoveFirst() { if (llData.length) { llData.shift(); llTraversalIndex = 0; llRender(); } }
+    function llReset() { llData = []; llTraversalIndex = 0; llRender(); }
+    llRender();
+
+    class BST {
+      constructor() { this.root = null; }
+      insert(v) {
+        const node = { val: v, left: null, right: null };
+        if (!this.root) { this.root = node; return; }
+        let cur = this.root;
+        while (true) {
+          if (v < cur.val) { if (!cur.left) { cur.left = node; return; } cur = cur.left; }
+          else if (v > cur.val) { if (!cur.right) { cur.right = node; return; } cur = cur.right; }
+          else return;
+        }
+      }
+      search(v) {
+        const path = []; let cur = this.root;
+        while (cur) { path.push(cur.val); if (v === cur.val) return { found: true, path }; cur = v < cur.val ? cur.left : cur.right; }
+        return { found: false, path };
+      }
+    }
+    let bst = new BST(); let treeHighlight = null; let treeHighlightPath = [];
+    function treeLayout(node, x, y, gap) {
+      if (!node) return []; const nodes = [{ val: node.val, x, y }];
+      if (node.left) nodes.push(...treeLayout(node.left, x - gap, y + 60, gap / 2));
+      if (node.right) nodes.push(...treeLayout(node.right, x + gap, y + 60, gap / 2));
+      return nodes;
+    }
+    function treeEdges(node, x, y, gap, edges = []) {
+      if (!node) return edges;
+      if (node.left) { edges.push({ x1: x, y1: y, x2: x - gap, y2: y + 60 }); treeEdges(node.left, x - gap, y + 60, gap / 2, edges); }
+      if (node.right) { edges.push({ x1: x, y1: y, x2: x + gap, y2: y + 60 }); treeEdges(node.right, x + gap, y + 60, gap / 2, edges); }
+      return edges;
+    }
+    function treeRender() {
+      const svg = document.getElementById('tree-svg'); const W = Math.max(svg.parentElement.clientWidth || 480, 800); svg.setAttribute('width', W);
+      if (!bst.root) { svg.innerHTML = ''; return; }
+      const cx = W / 2, cy = 30, gap = W / 4;
+      const nodes = treeLayout(bst.root, cx, cy, gap); const edges = treeEdges(bst.root, cx, cy, gap);
+      const maxY = Math.max(...nodes.map(n => n.y)) + 50; svg.setAttribute('height', Math.max(maxY, 120));
+      const edgeSVG = edges.map(e => `<line class="tree-edge" x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}"/>`).join('');
+      const nodeSVG = nodes.map(n => {
+        const isHL = n.val === treeHighlight; const isPath = bstPathNodes.includes(n.val);
+        let fill = '#1A1950', stroke = 'rgba(255,255,255,0.2)', sw = 2;
+        if (isHL) { fill = '#FD79A8'; stroke = '#FD79A8'; sw = 3; } else if (isPath) { fill = 'rgba(255,255,255,0.2)'; stroke = '#fff'; sw = 3; }
+        return `<g class="tree-node" onclick="treeEditClick(${n.val})"><circle cx="${n.x}" cy="${n.y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/><text x="${n.x}" y="${n.y + 4}" text-anchor="middle">${n.val}</text></g>`;
+      }).join('');
+      svg.innerHTML = edgeSVG + nodeSVG;
+    }
+
+    function getSubtreeMax(node) {
+      if (!node) return -Infinity;
+      let cur = node;
+      while (cur.right) cur = cur.right;
+      return cur.val;
+    }
+    function getSubtreeMin(node) {
+      if (!node) return Infinity;
+      let cur = node;
+      while (cur.left) cur = cur.left;
+      return cur.val;
+    }
+
+    let bstPathNodes = [];
+    function treeEditClick(nodeVal) {
+      if (bstPathNodes.length > 0 && bstPathNodes[bstPathNodes.length - 1] === nodeVal) {
+        let min = 1;
+        let max = 99;
+        let temp = bst.root;
+        const searchRes = bst.search(nodeVal);
+        if (searchRes && searchRes.found) {
+          const path = searchRes.path;
+          for (let i = 1; i < path.length; i++) {
+            if (path[i] < temp.val) {
+              max = temp.val - 1;
+              temp = temp.left;
+            } else {
+              min = temp.val + 1;
+              temp = temp.right;
+            }
+          }
+          if (temp.left) {
+            const leftMax = getSubtreeMax(temp.left);
+            min = Math.max(min, leftMax + 1);
+          }
+          if (temp.right) {
+            const rightMin = getSubtreeMin(temp.right);
+            max = Math.min(max, rightMin - 1);
+          }
+        }
+
+        showPrompt(`Εισάγετε νέα τιμή για τον κόμβο ${nodeVal} (επιτρεπτά: ${min} έως ${max}):`, nodeVal, (newVal) => {
+          if (newVal !== null) {
+            const v = parseInt(newVal);
+            if (!isNaN(v)) {
+              if (v < min || v > max) {
+                showModal('Μη Έγκυρη Τιμή! ❌', `Για να διατηρηθεί η ιδιότητα του Δυαδικού Δέντρου (Αριστερά &lt; Γονέας &lt; Δεξιά), η τιμή αυτού του κόμβου πρέπει να είναι από <strong>${min}</strong> έως <strong>${max}</strong>.`, 'ΟΚ', null);
+                bstPathNodes = [];
+                treeRender();
+                return;
+              }
+              let nodeToEdit = bst.root;
+              const path = bst.search(nodeVal).path;
+              for (let i = 1; i < path.length; i++) {
+                if (path[i] < nodeToEdit.val) nodeToEdit = nodeToEdit.left;
+                else nodeToEdit = nodeToEdit.right;
+              }
+              nodeToEdit.val = v;
+              bstPathNodes = [];
+              treeRender();
+              showModal('Επιτυχία! 🎉', `Η τιμή του κόμβου άλλαξε με επιτυχία σε ${v} και η ιδιότητα BST διατηρήθηκε!`, 'Τέλεια!', null);
+            }
+          }
+        });
+        return;
+      }
+      if (bstPathNodes.length === 0) {
+        if (bst.root && bst.root.val === nodeVal) { bstPathNodes.push(nodeVal); treeRender(); setMsg('tree-msg', `Επέλεξες τη ρίζα. Κάνε κλικ στα παιδιά της ή ξανά πάνω της για επεξεργασία.`); }
+        else { showModal('Λάθος Διαδρομή!', 'Στο δέντρο πρέπει πάντα να ξεκινάς την αναζήτηση από τη Ρίζα (Root)!', 'ΟΚ', null); }
+      } else {
+        const lastVal = bstPathNodes[bstPathNodes.length - 1];
+        let parentNode = bst.root; const path = bst.search(lastVal).path;
+        for (let i = 1; i < path.length; i++) { if (path[i] < parentNode.val) parentNode = parentNode.left; else parentNode = parentNode.right; }
+        if ((parentNode.left && parentNode.left.val === nodeVal) || (parentNode.right && parentNode.right.val === nodeVal)) {
+          bstPathNodes.push(nodeVal); treeRender(); setMsg('tree-msg', `Κατέβηκες στον κόμβο ${nodeVal}. Ξανά-κάνε κλικ για επεξεργασία ή συνέχισε στα παιδιά του.`);
+        } else { showModal('Λάθος!', 'Πρέπει να επιλέξεις ένα άμεσο παιδί του τρέχοντος κόμβου ακολουθώντας τα βέλη.', 'ΟΚ', () => { bstPathNodes = []; treeRender(); }); }
+      }
+    }
+
+    function treeInsert() { const v = getValOrRandom('tree-input'); if (!isNaN(v)) { treeHighlight = null; treeHighlightPath = []; bstPathNodes = []; bst.insert(v); treeRender(); } }
+    function treeSearch() { const v = parseInt(document.getElementById('tree-search').value); if (isNaN(v)) return; const res = bst.search(v); treeHighlight = res.found ? v : null; treeHighlightPath = res.path; bstPathNodes = []; treeRender(); }
+    function treeReset() { bst = new BST(); treeHighlight = null; treeHighlightPath = []; bstPathNodes = []; treeRender(); }
+    function treeFillDemo() { bst = new BST(); treeHighlight = null; treeHighlightPath = []; bstPathNodes = [];[40, 20, 60, 10, 30, 50, 70].forEach(v => bst.insert(v)); treeRender(); }
+    treeFillDemo();
+
+    let heapData = [];
+    function buildMaxHeap() { for (let i = Math.floor(heapData.length / 2) - 1; i >= 0; i--) heapifyDown(i); }
+    function heapifyDown(i) {
+      let max = i, left = 2 * i + 1, right = 2 * i + 2;
+      if (left < heapData.length && heapData[left] > heapData[max]) max = left;
+      if (right < heapData.length && heapData[right] > heapData[max]) max = right;
+      if (max !== i) { [heapData[i], heapData[max]] = [heapData[max], heapData[i]]; heapifyDown(max); }
+    }
+    function heapifyUp(i) {
+      let parent = Math.floor((i - 1) / 2);
+      while (i > 0 && heapData[i] > heapData[parent]) { [heapData[i], heapData[parent]] = [heapData[parent], heapData[i]]; i = parent; parent = Math.floor((i - 1) / 2); }
+    }
+    function heapInsert() { const v = getValOrRandom('heap-input'); if (!isNaN(v)) { heapData.push(v); heapPathNodes = []; heapifyUp(heapData.length - 1); heapRender(); } }
+    function heapExtractMax() { if (heapData.length) { heapData[0] = heapData[heapData.length - 1]; heapData.pop(); heapPathNodes = []; if (heapData.length > 0) heapifyDown(0); heapRender(); } }
+    function heapReset() { heapData = []; heapPathNodes = []; heapRender(); }
+
+    let heapPathNodes = [];
+    function heapEditClick(idx) {
+      if (heapPathNodes.length > 0 && heapPathNodes[heapPathNodes.length - 1] === idx) {
+        showPrompt(`Εισάγετε νέα τιμή για τον κόμβο:`, heapData[idx], (newVal) => {
+          if (newVal !== null) {
+            const v = parseInt(newVal);
+            if (!isNaN(v)) {
+              heapData[idx] = v; heapPathNodes = []; buildMaxHeap(); heapRender();
+              showModal('Αναδιάταξη', `Η τιμή άλλαξε σε ${v}. Το δέντρο εκτέλεσε αυτόματη αναδιάταξη για να διατηρήσει την ισορροπία του Max-Heap!`, 'Τέλεια!', null);
+            }
+          }
+        });
+        return;
+      }
+      if (heapPathNodes.length === 0) {
+        if (idx === 0) { heapPathNodes.push(0); heapRender(); setMsg('heap-msg', `Επέλεξες τη ρίζα. Κάνε κλικ στα παιδιά της ή ξανά πάνω της για επεξεργασία.`); }
+        else { showModal('Λάθος Διαδρομή!', 'Στο δέντρο πρέπει πάντα να ξεκινάς από τη Ρίζα (Root)!', 'ΟΚ', null); }
+      } else {
+        const lastIdx = heapPathNodes[heapPathNodes.length - 1]; const left = 2 * lastIdx + 1, right = 2 * lastIdx + 2;
+        if (idx === left || idx === right) { heapPathNodes.push(idx); heapRender(); setMsg('heap-msg', `Κατέβηκες. Ξανά-κάνε κλικ για επεξεργασία.`); }
+        else { showModal('Λάθος!', 'Πρέπει να επιλέξεις ένα άμεσο παιδί του τρέχοντος κόμβου ακολουθώντας τα βέλη.', 'ΟΚ', () => { heapPathNodes = []; heapRender(); }); }
+      }
+    }
+
+    function heapRender() {
+      const svg = document.getElementById('heap-svg'); const W = Math.max(svg.parentElement.clientWidth || 480, 800); svg.setAttribute('width', W);
+      if (!heapData.length) { svg.innerHTML = ''; return; }
+      const cx = W / 2, cy = 30, gap = W / 4;
+      const nodes = [], edges = [];
+      function calcPos(index, x, y, currGap) {
+        if (index >= heapData.length) return; nodes.push({ val: heapData[index], x, y, index });
+        const left = 2 * index + 1, right = 2 * index + 2;
+        if (left < heapData.length) { edges.push({ x1: x, y1: y, x2: x - currGap, y2: y + 60 }); calcPos(left, x - currGap, y + 60, currGap / 2); }
+        if (right < heapData.length) { edges.push({ x1: x, y1: y, x2: x + currGap, y2: y + 60 }); calcPos(right, x + currGap, y + 60, currGap / 2); }
+      }
+      calcPos(0, cx, cy, gap);
+      const maxY = Math.max(...nodes.map(n => n.y)) + 50; svg.setAttribute('height', Math.max(maxY, 120));
+      const edgeSVG = edges.map(e => `<line class="tree-edge" x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}"/>`).join('');
+      const nodeSVG = nodes.map(n => {
+        const isPath = heapPathNodes.includes(n.index);
+        const stroke = isPath ? '#fff' : '#00CEC9'; const sw = isPath ? 4 : 2; const fill = isPath ? 'rgba(255,255,255,0.2)' : '#1A1950';
+        return `<g class="heap-node" onclick="heapEditClick(${n.index})"><circle cx="${n.x}" cy="${n.y}" r="20" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/><text x="${n.x}" y="${n.y + 4}" text-anchor="middle">${n.val}</text></g>`;
+      }).join('');
+      svg.innerHTML = edgeSVG + nodeSVG;
+    }
+    heapRender();
+
+
+    // ======== QUIZ MODE ========
+    const quizQuestions = [
+      { q: "Σε ποια δομή βγάζεις ΠΑΝΤΑ το στοιχείο που μπήκε τελευταίο (LIFO);", opts: ["Ουρά", "Στοίβα", "Πίνακας"], ans: 1, expl: "Η Στοίβα ακολουθεί τον κανόνα LIFO (Last-In, First-Out). Σκέψου το σαν μια στοίβα από πιάτα!" },
+      { q: "Ποια δομή είναι η καλύτερη για τη σειρά αναμονής στα ταμεία (FIFO);", opts: ["Ουρά", "Δέντρο", "Γράφος"], ans: 0, expl: "Η Ουρά ακολουθεί τον κανόνα FIFO (First-In, First-Out), ακριβώς όπως η ουρά στο ταμείο ενός σούπερ μάρκετ." },
+      { q: "Σε ένα Δυαδικό Δέντρο Αναζήτησης (BST), οι μικρότεροι αριθμοί πάνε...", opts: ["Δεξιά", "Στη Ρίζα", "Αριστερά"], ans: 2, expl: "Στο BST, όλα τα στοιχεία που είναι μικρότερα από τον γονιό τους μπαίνουν πάντα στο αριστερό παιδί." },
+      { q: "Ποιος αλγόριθμος βρίσκει τη συντομότερη διαδρομή στο GPS;", opts: ["Dijkstra", "Max-Heap", "Chaining"], ans: 0, expl: "Ο αλγόριθμος του Dijkstra υπολογίζει τη συντομότερη διαδρομή ανάμεσα σε κόμβους ενός γράφου, όπως οι δρόμοι στο GPS." },
+      { q: "Στο Max-Heap, το μεγαλύτερο στοιχείο βρίσκεται...", opts: ["Στον πάτο", "Στην κορυφή", "Στη μέση"], ans: 1, expl: "Σε ένα Max-Heap, ο γονιός είναι πάντα μεγαλύτερος από τα παιδιά του, άρα το μεγαλύτερο στοιχείο είναι πάντα στην κορυφή (Ρίζα)!" },
+      { q: "Τι κάνουμε όταν υπάρχει 'Σύγκρουση' (Collision) σε ένα Hash Table;", opts: ["Αλλάζουμε λειτουργικό", "Chaining / Open Addressing", "Διαγράφουμε τον πίνακα"], ans: 1, expl: "Οι συγκρούσεις επιλύονται με τεχνικές όπως το Chaining (δημιουργία λίστας στην ίδια θέση) ή το Open Addressing (εύρεση επόμενης κενής θέσης)." }
+    ];
+    let currentQuizQ = 0; let quizScore = 0;
+
+    function renderQuiz() {
+      const g = document.getElementById('quiz-container');
+      if (currentQuizQ >= quizQuestions.length) {
+        g.innerHTML = `<h3 style="font-size:2rem; margin-bottom:1rem; color:var(--c3); font-family:'Fredoka One', cursive;">Τέλος Quiz!</h3>
+      <p style="font-size:1.5rem; margin-bottom:2rem;">Το Σκορ σου: <strong style="color:var(--c1); font-size:2rem;">${quizScore}/${quizQuestions.length}</strong></p>
+      <button class="btn btn-gold" style="margin:0 auto; padding:1rem 2rem; font-size:1.2rem;" onclick="currentQuizQ=0; quizScore=0; renderQuiz();">Παίξε Ξανά!</button>`;
+        return;
+      }
+      const q = quizQuestions[currentQuizQ];
+      let html = `<div style="font-size:1.1rem; color:var(--muted); font-weight:bold; margin-bottom:1rem;">Ερώτηση ${currentQuizQ + 1} από ${quizQuestions.length}</div>
+              <div style="font-size:1.6rem; margin-bottom:2.5rem; font-weight:800; color:var(--text); line-height:1.4;">${q.q}</div>
+              <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; max-width:600px; margin:0 auto; flex-direction:column;">`;
+      q.opts.forEach((o, i) => { html += `<button class="btn btn-gray q-btn-active" style="padding:1rem; font-size:1.2rem; justify-content:center; text-align:center;" onclick="answerQuiz(${i})">${o}</button>`; });
+      html += `</div>`; g.innerHTML = html;
+    }
+    function answerQuiz(idx) {
+      const q = quizQuestions[currentQuizQ];
+      if (idx === q.ans) {
+        quizScore++;
+        showModal('Σωστά! ✅', q.expl, 'Επόμενη', () => { currentQuizQ++; renderQuiz(); });
+      } else {
+        showModal('Λάθος! ❌', `Η σωστή απάντηση ήταν: <strong>${q.opts[q.ans]}</strong>.<br><br>${q.expl}`, 'Συνέχεια', () => { currentQuizQ++; renderQuiz(); });
+      }
+    }
+
+
+    // ======== SORTING MODE ========
+    let sortData = [];
+    let sortType = 'bubble';
+    let sortSelectedIdx = null;
+
+    function initSort(type) {
+      sortType = type;
+      document.getElementById('sort-title').innerText = type === 'bubble' ? 'Bubble Sort (Ταξινόμηση Φυσαλίδας)' : 'Insertion Sort (Ταξινόμηση Εισαγωγής)';
+      document.getElementById('sort-desc').innerText = type === 'bubble' ? 'Αντάλλαξε γειτονικούς αριθμούς μέχρι να ταξινομηθούν όλοι!' : 'Διάλεξε έναν αριθμό και τοποθέτησέ τον στη σωστή του θέση πιο αριστερά!';
+      sortData = Array.from({ length: 6 }, () => Math.floor(Math.random() * 90) + 10);
+      sortSelectedIdx = null;
+      document.getElementById('sort-msg').innerText = '';
+      document.getElementById('sort-msg').style.background = 'transparent';
+      renderSort();
+    }
+
+    function renderSort() {
+      const vis = document.getElementById('sort-vis');
+      vis.innerHTML = sortData.map((val, i) => {
+        let isSelected = i === sortSelectedIdx;
+        return `<div class="sort-box ${isSelected ? 'selected' : ''}" onclick="sortClick(${i})">${val}</div>`;
+      }).join('');
+    }
+
+    function sortClick(idx) {
+      if (sortSelectedIdx === null) {
+        sortSelectedIdx = idx;
+        renderSort();
+      } else {
+        if (sortSelectedIdx === idx) {
+          sortSelectedIdx = null;
+          renderSort();
+          return;
+        }
+
+        if (sortType === 'bubble') {
+          if (Math.abs(sortSelectedIdx - idx) !== 1) {
+            showModal('Λάθος Κίνηση!', 'Στο Bubble Sort επιτρέπεται ΜΟΝΟ η ανταλλαγή γειτονικών (διπλανών) στοιχείων!', 'ΟΚ', null);
+            sortSelectedIdx = null; renderSort(); return;
+          }
+          let temp = sortData[sortSelectedIdx];
+          sortData[sortSelectedIdx] = sortData[idx];
+          sortData[idx] = temp;
+        } else if (sortType === 'insertion') {
+          if (idx > sortSelectedIdx) {
+            showModal('Λάθος Κίνηση!', 'Στο Insertion Sort μεταφέρουμε τα στοιχεία προς τα αριστερά (στο ήδη ταξινομημένο κομμάτι)!', 'ΟΚ', null);
+            sortSelectedIdx = null; renderSort(); return;
+          }
+          let temp = sortData[sortSelectedIdx];
+          sortData[sortSelectedIdx] = sortData[idx];
+          sortData[idx] = temp;
+        }
+
+        sortSelectedIdx = null;
+        renderSort();
+      }
+    }
+
+    function checkSort() {
+      let sorted = true;
+      for (let i = 0; i < sortData.length - 1; i++) {
+        if (sortData[i] > sortData[i + 1]) { sorted = false; break; }
+      }
+      const msgEl = document.getElementById('sort-msg');
+      if (sorted) {
+        msgEl.innerText = '✅ Τέλεια! Οι αριθμοί ταξινομήθηκαν σωστά!';
+        msgEl.style.background = 'rgba(78,205,196,0.2)';
+        msgEl.style.color = 'var(--c2)';
+        document.querySelectorAll('.sort-box').forEach(b => b.classList.add('sorted'));
+      } else {
+        msgEl.innerText = '❌ Όχι ακόμα! Υπάρχουν αριθμοί σε λάθος σειρά.';
+        msgEl.style.background = 'rgba(255,107,107,0.2)';
+        msgEl.style.color = 'var(--c1)';
+      }
+    }
+
+    // ======== DRAG & DROP MODE ========
+    const dndMissions = [
+      { type: 'array', title: 'Αποστολή 1: Ταξινόμηση Πίνακα', pool: [], slots: [], check: null, hint: '' },
+      { type: 'stack', title: 'Αποστολή 2: Υπολογιστής Στοίβας', pool: [], slots: [], check: null, hint: '' },
+      { type: 'queue', title: 'Αποστολή 3: Σειρά Προτεραιότητας', pool: [], slots: [], check: null, hint: '' },
+      { type: 'tree', title: 'Αποστολή 4: Χτίσε το Δέντρο (BST)', pool: [], slots: [], check: null, hint: '' },
+      { type: 'tree', title: 'Αποστολή 5: Χτίσε τον Σωρό (Max-Heap)', pool: [], slots: [], check: null, hint: '' },
+      { type: 'hash', title: 'Αποστολή 6: Πίνακας Κατακερματισμού', pool: [], slots: [], check: null, hint: '' },
+      { type: 'graph', title: 'Αποστολή 7: Διάσχιση Γράφου (BFS)', pool: [], slots: [], check: null, hint: '' },
+      { type: 'trie', title: 'Αποστολή 8: Κατασκευή Trie', pool: [], slots: [], check: null, hint: '' }
+    ];
+    let currDND = -1; let dndState = {};
+
+    function generateBSTValues() {
+      let R = Math.floor(Math.random() * 20) + 40; // 40-59
+      let L = Math.floor(Math.random() * 10) + R - 20; // R-20 to R-11
+      let RT = Math.floor(Math.random() * 10) + R + 11; // R+11 to R+20
+      let LL = Math.floor(Math.random() * 5) + L - 10; // L-10 to L-6
+      let LR = Math.floor(Math.random() * 5) + L + 3; // L+3 to L+7
+      if (LR >= R) LR = R - 1;
+      let RL = Math.floor(Math.random() * 5) + R + 3; // R+3 to R+7
+      if (RL >= RT) RL = RT - 1;
+
+      let vals = [R, L, RT, LL, LR, RL];
+      let uniqueVals = [...new Set(vals)];
+      if (uniqueVals.length < 6 || vals.some(v => v < 1 || v > 99)) {
+        return generateBSTValues();
+      }
+      return { R, L, RT, LL, LR, RL };
+    }
+
+    function generateDndMission(idx) {
+      const m = dndMissions[idx];
+      let pool = [];
+      let slots = [];
+      let check = null;
+      let desc = '';
+      let hint = '';
+
+      if (idx === 0) { // Mission 1: Array Sorting
+        let set = new Set();
+        while (set.size < 4) {
+          set.add(Math.floor(Math.random() * 99) + 1);
+        }
+        pool = [...set];
+        slots = [null, null, null, null];
+        const sorted = [...pool].sort((a, b) => a - b);
+        desc = `Βάλε τους αριθμούς σε αύξουσα σειρά (από το μικρότερο στο μεγαλύτερο) στις 4 θέσεις του πίνακα! Οι αριθμοί σου είναι: ${pool.join(', ')}.`;
+        hint = "Η ταξινόμηση σημαίνει να τοποθετήσεις τους αριθμούς από το μικρότερο προς το μεγαλύτερο. Χρησιμοποίησε τη λογική σύγκρισης.";
+        check = s => s.every((val, i) => val === sorted[i]);
+      }
+      else if (idx === 1) { // Mission 2: Stack
+        let x = Math.floor(Math.random() * 60) + 20;
+        let y = 100 - x;
+        let set = new Set([x, y]);
+        while (set.size < 4) {
+          let z = Math.floor(Math.random() * 99) + 1;
+          if (z + x !== 100 && z + y !== 100) set.add(z);
+        }
+        pool = [...set];
+        pool.sort(() => Math.random() - 0.5);
+        slots = [null, null];
+        desc = 'Βάλε στη Στοίβα δύο αριθμούς ώστε το άθροισμά τους να κάνει 100! Ακολουθώντας τον κανόνα LIFO, μπορείς μόνο να ρίξεις στοιχεία στη στοίβα (Push) και να τα αφαιρέσεις με το κουμπί Pop από την κορυφή.';
+        hint = "Η στοίβα λειτουργεί όπως ένα σωρό πιάτων: το τελευταίο που προσθέτεις είναι το πρώτο που αφαιρείς. Βρες τα κατάλληλα ζεύγη ώστε το άθροισμα να είναι 100.";
+        check = s => s[0] + s[1] === 100;
+      }
+      else if (idx === 2) { // Mission 3: Queue
+        let set = new Set();
+        while (set.size < 3) {
+          set.add(Math.floor(Math.random() * 99) + 1);
+        }
+        pool = [...set];
+        pool.sort(() => Math.random() - 0.5);
+        slots = [null, null, null];
+        const sorted = [...pool].sort((a, b) => b - a);
+        desc = `Μπαίνουν με τη σειρά FIFO (First-In, First-Out). Έχεις 3 αριθμούς (${pool.join(', ')}). Βάλε ΠΡΩΤΑ (Enqueue) τον μεγαλύτερο και ΤΕΛΕΥΤΑ τον μικρότερο ώστε η τελική κατάσταση να είναι [${sorted.join(', ')}].`;
+        hint = "Στο FIFO το πρώτο που μπαίνει θα είναι το πρώτο που βγαίνει. Τοποθέτησε τα στοιχεία ώστε η σειρά εξόδου να ταιριάζει με τη λογική αυτή.";
+        check = s => s.every((val, i) => val === sorted[i]);
+      }
+      else if (idx === 3) { // Mission 4: BST Tree
+        const bstVals = generateBSTValues();
+        pool = [bstVals.L, bstVals.RT, bstVals.LL, bstVals.LR, bstVals.RL];
+        pool.sort(() => Math.random() - 0.5);
+        slots = [bstVals.R, null, null, null, null, null];
+        desc = `Χτίσε ένα Δυαδικό Δέντρο Αναζήτησης (BST). Η Ρίζα είναι το ${bstVals.R}. Βάλε τα παιδιά σωστά (Αριστερά μικρότερα, Δεξιά μεγαλύτερα)!`;
+        hint = "Σε ένα BST κάθε αριστερό παιδί είναι μικρότερο από τον γονέα, κάθε δεξιό παιδί μεγαλύτερο. Ξεκίνα από τη ρίζα και τοποθέτησε τα υπόλοιπα σύμφωνα με αυτόν τον κανόνα.";
+        check = s => s[0] === bstVals.R && s[1] === bstVals.L && s[2] === bstVals.RT && s[3] === bstVals.LL && s[4] === bstVals.LR && s[5] === bstVals.RL;
+      }
+      else if (idx === 4) { // Mission 5: Max-Heap Tree
+        let set = new Set();
+        while (set.size < 9) {
+          set.add(Math.floor(Math.random() * 99) + 1);
+        }
+        pool = [...set];
+        slots = [null, null, null, null, null, null, null, null, null];
+        desc = 'Φτιάξε ένα μεγάλο Max-Heap (9 κόμβοι)! Ο Γονιός πρέπει να είναι ΠΑΝΤΑ μεγαλύτερος από τα παιδιά του.';
+        hint = "Σε ένα Max-Heap ο γονιός είναι πάντα μεγαλύτερος ή ίσος από τα παιδιά του. Τοποθέτησε πρώτα τον μεγαλύτερο αριθμό στην κορυφή.";
+        check = s => {
+          for (let i = 0; i < Math.floor(s.length / 2); i++) {
+            if (2 * i + 1 < s.length && s[i] < s[2 * i + 1]) return false;
+            if (2 * i + 2 < s.length && s[i] < s[2 * i + 2]) return false;
+          }
+          return true;
+        };
+      }
+      else if (idx === 5) { // Mission 6: Hash Table with Chaining
+        let poolSet = new Set();
+        while (poolSet.size < 6) {
+          poolSet.add(Math.floor(Math.random() * 90) + 10);
+        }
+        pool = [...poolSet];
+        pool.sort(() => Math.random() - 0.5);
+        slots = Array(15).fill(null);
+        desc = `Έχεις έναν Πίνακα Κατακερματισμού 5 θέσεων (0‑4) με Χειρισμό Συγκρούσεων με Αλυσίδες (Chaining) και τη συνάρτηση hash(x) = x % 5. Τοποθέτησε τους 6 αριθμούς ${pool.join(', ')} στις σωστές αλυσίδες!`;
+        hint = "Η συνάρτηση hash(x) = x % 5 καθορίζει σε ποιο index (0-4) ανήκει κάθε αριθμός. Αν περισσότεροι αριθμοί έχουν το ίδιο hash, μπαίνουν στην ίδια στήλη (αλυσίδα), ο ένας πάνω από τον άλλο!";
+        check = s => {
+          let placedCount = s.filter(x => x !== null).length;
+          if (placedCount < 6) return false;
+          for (let j = 0; j < 15; j++) {
+            if (s[j] !== null) {
+              if (s[j] % 5 !== j % 5) return false;
+            }
+          }
+          return true;
+        };
+      }
+      else if (idx === 6) { // Mission 7: Graph BFS
+        pool = ['A', 'B', 'C', 'D', 'E'];
+        pool.sort(() => Math.random() - 0.5);
+        slots = [null, null, null, null, null];
+        desc = `Βρες τη σειρά με την οποία θα επισκεφθούμε τους κόμβους του γράφου ξεκινώντας από τον κόμβο 'A' χρησιμοποιώντας τον αλγόριθμο BFS (Breadth‑First Search).`;
+        hint = "Το BFS εξερευνά πρώτα όλους τους γειτονικούς κόμβους του τρέχοντος, στη συνέχεια προχωρά στα επόμενα επίπεδα. Σκέψου τις στρώσεις που δημιουργούνται από το 'A'.";
+        check = s => (s[0] === 'A' && s[1] === 'B' && s[2] === 'C' && s[3] === 'D' && s[4] === 'E') || (s[0] === 'A' && s[1] === 'C' && s[2] === 'B' && s[3] === 'E' && s[4] === 'D');
+      }
+      else if (idx === 7) { // Mission 8: Trie Word Builder
+        pool = ['C', 'A', 'O', 'T', 'R', 'W'];
+        pool.sort(() => Math.random() - 0.5);
+        slots = [null, null, null, null, null, null];
+        desc = `Συμπλήρωσε το Trie (Δέντρο Προθεμάτων) ώστε να αποθηκεύει σωστά τις λέξεις: CAT, CAR και COW. Σύρε τα κατάλληλα γράμματα στα κενά!`;
+        hint = "Στο Trie τα γράμματα μοιράζονται κοινές προθέσεις. Η ρίζα είναι το 'C', τα επόμενα γράμματα είναι τα κοινά ή διαφορετικά γράμματα των λέξεων.";
+        check = s => s[0] === 'C' && s[1] === 'A' && s[2] === 'O' && ((s[3] === 'T' && s[4] === 'R') || (s[3] === 'R' && s[4] === 'T')) && s[5] === 'W';
+      }
+
+      dndState = { pool, slots };
+      m.check = check;
+      m.desc = desc;
+      m.hint = hint;
+      m.slots = slots;
+    }
+
+    function initDND() {
+      const lobbyEl = document.getElementById('dnd-lobby-view');
+      const gameEl = document.getElementById('dnd-game-view');
+
+      if (currDND === -1) {
+        lobbyEl.style.display = 'block';
+        gameEl.style.display = 'none';
+        renderDndLobby();
+        return;
+      }
+
+      lobbyEl.style.display = 'none';
+      gameEl.style.display = 'block';
+
+      if (currDND >= dndMissions.length) {
+        document.getElementById('dnd-mission-title').innerText = '🏆 Συγχαρητήρια!';
+        document.getElementById('dnd-mission-desc').innerText = 'Τερμάτισες όλες τις αποστολές Drag & Drop με επιτυχία!';
+        document.getElementById('drag-pool').innerHTML = '';
+        document.getElementById('mission-vis').innerHTML = '<div style="font-size:3rem; text-align:center;">🏆✨🎉</div>';
+        document.getElementById('dnd-msg').innerText = '🏆 Ολοκλήρωσες όλες τις δομές!';
+        document.getElementById('dnd-msg').style.background = 'rgba(78,205,196,0.3)';
+        return;
+      }
+
+      generateDndMission(currDND);
+
+      const m = dndMissions[currDND];
+      document.getElementById('dnd-mission-title').innerText = m.title;
+      // Rebuild desc element: clear old content, add text span + hint button
+      const descEl = document.getElementById('dnd-mission-desc');
+      descEl.innerHTML = '';
+      const descSpan = document.createElement('span');
+      descSpan.innerText = m.desc;
+      descEl.appendChild(descSpan);
+      if (m.hint) {
+        const hintBtn = document.createElement('button');
+        hintBtn.className = 'btn btn-info';
+        hintBtn.style.cssText = 'margin-left:0.75rem; padding:0.3rem 0.9rem; font-size:0.85rem; vertical-align:middle;';
+        hintBtn.innerText = '💡 Hint';
+        hintBtn.onclick = () => showInfo(' Υπόδειξη', m.hint);
+        descEl.appendChild(hintBtn);
+      }
+      document.getElementById('dnd-msg').innerText = '';
+      document.getElementById('dnd-msg').style.background = 'transparent';
+      renderDND();
+    }
+
+    function renderDndLobby() {
+      const lobbyEl = document.getElementById('dnd-lobby-view');
+      let html = `<h3 style="color:var(--c6); font-size:1.8rem; margin-bottom:1rem; text-align:center;">Προθάλαμος Αποστολών Drag & Drop</h3><p style="text-align:center; margin-bottom:2rem; color:var(--text);">Διάλεξε ποια αποστολή Drag & Drop θέλεις να παίξεις!</p>`;
+      html += `<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:1rem;">`;
+      const missions = [
+        "1. Ταξινόμηση Πίνακα",
+        "2. Υπολογιστής Στοίβας",
+        "3. Σειρά Προτεραιότητας",
+        "4. Χτίσε το Δέντρο (BST)",
+        "5. Χτίσε τον Σωρό (Max-Heap)",
+        "6. Πίνακας Κατακερματισμού",
+        "7. Διάσχιση Γράφου (BFS)",
+        "8. Κατασκευή Trie"
+      ];
+      missions.forEach((m, i) => {
+        html += `<div onclick="currDND=${i}; initDND();" style="background:rgba(108,92,231,0.1); border:2px solid var(--c6); border-radius:12px; padding:1.5rem 1rem; text-align:center; cursor:pointer; font-weight:bold; color:var(--c6); transition:transform 0.2s, background 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(108,92,231,0.3)';" onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(108,92,231,0.1)';">${m}</div>`;
+      });
+      html += `</div>`;
+      lobbyEl.innerHTML = html;
+    }
+
+    function dBlockHtml(val, origin) {
+      const isChar = typeof val === 'string' && val.length === 1;
+      const extraStyle = isChar ? 'width:36px; height:36px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; line-height:36px; text-align:center;' : '';
+      return `<div class="drag-block" style="touch-action:none; ${extraStyle}" onpointerdown="customDStart(event, '${val}', '${origin}')">${val}</div>`;
+    }
+
+    function renderDND() {
+      const popBtn = document.getElementById('btn-stack-pop');
+      const deqBtn = document.getElementById('btn-queue-dequeue');
+      const actionDiv = document.getElementById('dnd-action-btn');
+      if (popBtn) popBtn.style.display = 'none';
+      if (deqBtn) deqBtn.style.display = 'none';
+      if (actionDiv) actionDiv.style.display = 'none';
+
+      const poolEl = document.getElementById('drag-pool');
+      poolEl.innerHTML = dndState.pool.map(v => dBlockHtml(v, 'pool')).join('');
+      const visEl = document.getElementById('mission-vis');
+      const type = dndMissions[currDND].type;
+      let html = '';
+      if (type === 'array') { html = `<div style="display:flex; gap:0.5rem; align-items:flex-end;">` + dndState.slots.map((val, i) => `<div style="display:flex; flex-direction:column; align-items:center; gap:5px;"><div class="drop-slot" data-slot="${i}">${val !== null ? dBlockHtml(val, i) : ''}</div><div style="color:var(--muted); font-size:0.8rem;">[${i}]</div></div>`).join('') + `</div>`; }
+      else if (type === 'stack') {
+        const stackItems = dndState.slots.filter(x => x !== null);
+        html = `<div style="display:flex; flex-direction:column; align-items:center; gap:15px;">` +
+          `<div class="drop-slot" data-slot="stack" style="width:140px; min-height:130px; border:3px dashed var(--c2); border-top:none; border-radius:0 0 15px 15px; background:rgba(0,0,0,0.2); padding:10px; display:flex; flex-direction:column-reverse; gap:8px;">` +
+          (stackItems.length === 0 ? `<div style="color:var(--muted); font-size:0.85rem; text-align:center; margin:auto 0; pointer-events:none;">Στοίβα (Κενή)</div>` : stackItems.map(val => `<div class="drag-block" style="cursor:default; background:var(--c2); color:#111; font-weight:900; pointer-events:none;">${val}</div>`).join('')) +
+          `</div>` +
+          `</div>`;
+        // Update static Pop button (in DOM, safe from innerHTML re-render)
+        const popBtn = document.getElementById('btn-stack-pop');
+        const deqBtn = document.getElementById('btn-queue-dequeue');
+        const actionDiv = document.getElementById('dnd-action-btn');
+        if (popBtn) { popBtn.style.display = 'inline-flex'; popBtn.disabled = (stackItems.length === 0); }
+        if (deqBtn) deqBtn.style.display = 'none';
+        if (actionDiv) actionDiv.style.display = 'block';
+      }
+      else if (type === 'queue') {
+        const queueItems = dndState.slots.filter(x => x !== null);
+        html = `<div style="display:flex; flex-direction:column; align-items:center; gap:20px;">` +
+          `<div class="drop-slot" data-slot="enqueue" style="width:220px; height:50px; border:3px dashed var(--c8); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--c8); font-weight:bold; background:rgba(0,0,0,0.2);">Εισαγωγή (Enqueue) Εδώ</div>` +
+          `<div style="display:flex; align-items:center; gap:10px;">` +
+          `<div style="color:gray; font-weight:bold;">Έξοδος (Head) &larr;</div>` +
+          dndState.slots.map(val => `<div style="width:60px; height:60px; border:2px solid ${val !== null ? 'var(--c8)' : 'var(--muted)'}; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.02);">${val !== null ? `<div class="drag-block" style="cursor:default; background:var(--c8); color:#111; font-weight:900; pointer-events:none;">${val}</div>` : ''}</div>`).join('') +
+          `<div style="color:gray; font-weight:bold;">&larr; Είσοδος (Tail)</div>` +
+          `</div>` +
+          `</div>`;
+        // Update static Dequeue button
+        const popBtn2 = document.getElementById('btn-stack-pop');
+        const deqBtn2 = document.getElementById('btn-queue-dequeue');
+        const actionDiv2 = document.getElementById('dnd-action-btn');
+        if (popBtn2) popBtn2.style.display = 'none';
+        if (deqBtn2) { deqBtn2.style.display = 'inline-flex'; deqBtn2.disabled = (queueItems.length === 0); }
+        if (actionDiv2) actionDiv2.style.display = 'block';
+      }
+
+      else if (type === 'tree') {
+        const W = 500, H = 260;
+        html = `<div style="position:relative; width:${W}px; height:${H}px; margin:0 auto; overflow:visible;"><svg width="${W}" height="${H}" style="position:absolute; top:0; left:0; z-index:1; overflow:visible;">`;
+        const nodes = [];
+        function calcPos(index, x, y, currGap) {
+          if (index >= dndState.slots.length) return; nodes.push({ index, x, y });
+          const left = 2 * index + 1, right = 2 * index + 2;
+          if (left < dndState.slots.length) { html += `<line x1="${x + 25}" y1="${y + 25}" x2="${x - currGap + 25}" y2="${y + 70 + 25}" stroke="var(--muted)" stroke-width="2"/>`; calcPos(left, x - currGap, y + 70, currGap / 1.8); }
+          if (right < dndState.slots.length) { html += `<line x1="${x + 25}" y1="${y + 25}" x2="${x + currGap + 25}" y2="${y + 70 + 25}" stroke="var(--muted)" stroke-width="2"/>`; calcPos(right, x + currGap, y + 70, currGap / 1.8); }
+        }
+        const rootVal = dndState.slots[0];
+        calcPos(0, W / 2 - 25, 0, 140);
+        html += `</svg>`;
+        nodes.forEach(n => {
+          const isRootM4 = currDND === 3 && n.index === 0 && dndState.slots[0] === rootVal;
+          const bg = isRootM4 ? 'var(--c6)' : 'transparent';
+          const inner = dndState.slots[n.index] !== null ? (isRootM4 ? `<div class="drag-block" style="cursor:default;">${dndState.slots[n.index]}</div>` : dBlockHtml(dndState.slots[n.index], n.index)) : '';
+          html += `<div style="position:absolute; top:${n.y}px; left:${n.x}px; width:50px; height:50px; z-index:2; background:${bg}; border-radius:10px;" class="drop-slot" data-slot="${n.index}">${inner}</div>`;
+        });
+        html += `</div>`;
+      }
+      else if (type === 'hash') {
+        html = `<div style="display:flex; flex-direction:column; gap:15px; align-items:center; width:100%;">` +
+          `<div style="font-weight:bold; color:var(--c6); font-size:1.3rem; font-family:'Fredoka One', cursive;">hash(x) = x % 5</div>` +
+          `<div style="display:flex; gap:20px; justify-content:center; padding:15px; background:rgba(0,0,0,0.2); border-radius:15px; border:2px solid rgba(255,255,255,0.05); min-width:450px;">`;
+        for (let b = 0; b < 5; b++) {
+          html += `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;">` +
+            `<div style="display:flex; flex-direction:column-reverse; gap:6px; background:rgba(255,255,255,0.03); padding:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); min-height:190px; justify-content:flex-start; width:80px; align-items:center;">`;
+          for (let level = 0; level < 3; level++) {
+            const slotIdx = b + level * 5;
+            const val = dndState.slots[slotIdx];
+            html += `<div class="drop-slot" data-slot="${slotIdx}" style="width:65px; height:55px; border:2px dashed var(--c6); border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(108,92,231,0.03);">${val !== null ? dBlockHtml(val, slotIdx) : ''}</div>`;
+          }
+          html += `</div>` +
+            `<div style="font-weight:900; color:var(--c6); font-size:1rem; margin-top:4px;">Index [${b}]</div>` +
+            `</div>`;
+        }
+        html += `</div></div>`;
+      }
+      else if (type === 'graph') {
+        const W = 400, H = 160;
+        html = `<div style="display:flex; flex-direction:column; align-items:center; gap:20px;">` +
+          `<div style="position:relative; width:${W}px; height:${H}px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid rgba(255,255,255,0.1);">` +
+          `<svg width="${W}" height="${H}" style="position:absolute; top:0; left:0;">` +
+          `<defs><marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--c5)"/></marker></defs>` +
+          `<line x1="50" y1="80" x2="150" y2="40" stroke="var(--c5)" stroke-width="3" marker-end="url(#arrow)"/>` +
+          `<line x1="50" y1="80" x2="150" y2="120" stroke="var(--c5)" stroke-width="3" marker-end="url(#arrow)"/>` +
+          `<line x1="150" y1="40" x2="280" y2="40" stroke="var(--c5)" stroke-width="3" marker-end="url(#arrow)"/>` +
+          `<line x1="150" y1="120" x2="280" y2="120" stroke="var(--c5)" stroke-width="3" marker-end="url(#arrow)"/>` +
+          `</svg>` +
+          `<div style="position:absolute; left:30px; top:60px; width:40px; height:40px; border-radius:50%; background:var(--c5); color:#111; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; box-shadow:0 0 10px rgba(78,205,196,0.3);">A</div>` +
+          `<div style="position:absolute; left:130px; top:20px; width:40px; height:40px; border-radius:50%; background:var(--c5); color:#111; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; box-shadow:0 0 10px rgba(78,205,196,0.3);">B</div>` +
+          `<div style="position:absolute; left:130px; top:100px; width:40px; height:40px; border-radius:50%; background:var(--c5); color:#111; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; box-shadow:0 0 10px rgba(78,205,196,0.3);">C</div>` +
+          `<div style="position:absolute; left:260px; top:20px; width:40px; height:40px; border-radius:50%; background:var(--c5); color:#111; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; box-shadow:0 0 10px rgba(78,205,196,0.3);">D</div>` +
+          `<div style="position:absolute; left:260px; top:100px; width:40px; height:40px; border-radius:50%; background:var(--c5); color:#111; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem; box-shadow:0 0 10px rgba(78,205,196,0.3);">E</div>` +
+          `</div>` +
+          `<div style="display:flex; gap:10px; align-items:center;">` +
+          `<div style="font-weight:bold; color:var(--c5); font-size:1.1rem;">Σειρά BFS:</div>` +
+          dndState.slots.map((val, i) => `
+                 <div class="drop-slot" data-slot="${i}" style="width:50px; height:50px; border:2px dashed var(--c5); border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(78,205,196,0.05);">
+                   ${val !== null ? dBlockHtml(val, i) : ''}
+                 </div>
+               `).join('') +
+          `</div>` +
+          `</div>`;
+      }
+      else if (type === 'trie') {
+        const W = 400, H = 220;
+        html = `<div style="position:relative; width:${W}px; height:${H}px; margin:0 auto; overflow:visible;">` +
+          `<svg width="${W}" height="${H}" style="position:absolute; top:0; left:0; z-index:1; overflow:visible;">` +
+          `<line x1="200" y1="20" x2="200" y2="70" stroke="var(--muted)" stroke-width="2"/>` +
+          `<line x1="200" y1="70" x2="110" y2="120" stroke="var(--muted)" stroke-width="2"/>` +
+          `<line x1="200" y1="70" x2="290" y2="120" stroke="var(--muted)" stroke-width="2"/>` +
+          `<line x1="110" y1="120" x2="60" y2="180" stroke="var(--muted)" stroke-width="2"/>` +
+          `<line x1="110" y1="120" x2="160" y2="180" stroke="var(--muted)" stroke-width="2"/>` +
+          `<line x1="290" y1="120" x2="290" y2="180" stroke="var(--muted)" stroke-width="2"/>` +
+          `</svg>` +
+          `<div style="position:absolute; top:0px; left:180px; width:40px; height:40px; background:var(--muted); color:#111; font-weight:bold; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:2; box-shadow: 0 4px 6px rgba(0,0,0,0.15);">*</div>` +
+          `<div style="position:absolute; top:50px; left:180px; width:40px; height:40px; z-index:2; border-radius:50%; border: 2px dashed var(--muted); background:rgba(0,0,0,0.2);" class="drop-slot" data-slot="0">${dndState.slots[0] !== null ? dBlockHtml(dndState.slots[0], 0) : ''}</div>` +
+          `<div style="position:absolute; top:100px; left:90px; width:40px; height:40px; z-index:2; border-radius:50%; border: 2px dashed var(--muted); background:rgba(0,0,0,0.2);" class="drop-slot" data-slot="1">${dndState.slots[1] !== null ? dBlockHtml(dndState.slots[1], 1) : ''}</div>` +
+          `<div style="position:absolute; top:100px; left:270px; width:40px; height:40px; z-index:2; border-radius:50%; border: 2px dashed var(--muted); background:rgba(0,0,0,0.2);" class="drop-slot" data-slot="2">${dndState.slots[2] !== null ? dBlockHtml(dndState.slots[2], 2) : ''}</div>` +
+          `<div style="position:absolute; top:160px; left:40px; width:40px; height:40px; z-index:2; border-radius:50%; border: 2px dashed var(--muted); background:rgba(0,0,0,0.2);" class="drop-slot" data-slot="3">${dndState.slots[3] !== null ? dBlockHtml(dndState.slots[3], 3) : ''}</div>` +
+          `<div style="position:absolute; top:160px; left:140px; width:40px; height:40px; z-index:2; border-radius:50%; border: 2px dashed var(--muted); background:rgba(0,0,0,0.2);" class="drop-slot" data-slot="4">${dndState.slots[4] !== null ? dBlockHtml(dndState.slots[4], 4) : ''}</div>` +
+          `<div style="position:absolute; top:160px; left:270px; width:40px; height:40px; z-index:2; border-radius:50%; border: 2px dashed var(--muted); background:rgba(0,0,0,0.2);" class="drop-slot" data-slot="5">${dndState.slots[5] !== null ? dBlockHtml(dndState.slots[5], 5) : ''}</div>` +
+          `</div>`;
+      }
+      visEl.innerHTML = html;
+    }
+
+    let dndDragEl = null; let dndDragVal = null; let dndOffsetX = 0; let dndOffsetY = 0; let dndOrigin = null;
+    let dndAdvanceTimer = null;
+
+    // Event delegation for Pop/Dequeue buttons (pointerup fires reliably on mobile)
+    document.addEventListener('pointerup', function (e) {
+      if (dndDragEl) return; // drag in progress, skip
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      if (btn.getAttribute('data-disabled') === 'true') return;
+      const action = btn.getAttribute('data-action');
+      e.stopPropagation();
+      if (action === 'stackPop') dndStackPop();
+      else if (action === 'queueDequeue') queueDequeue();
+    }, true); // capture phase so it runs before drag pointerup handler
+
+    function customDStart(e, val, origin) {
+      e.preventDefault();
+      dndDragVal = isNaN(val) ? val : parseInt(val);
+      dndOrigin = origin;
+      const rect = e.target.getBoundingClientRect();
+      dndOffsetX = e.clientX - rect.left; dndOffsetY = e.clientY - rect.top;
+
+      dndDragEl = document.createElement('div');
+      dndDragEl.className = 'drag-block'; dndDragEl.innerText = val;
+      dndDragEl.style.position = 'fixed'; dndDragEl.style.left = (e.clientX - dndOffsetX) + 'px';
+      dndDragEl.style.top = (e.clientY - dndOffsetY) + 'px'; dndDragEl.style.zIndex = 10000;
+      dndDragEl.style.pointerEvents = 'none';
+      dndDragEl.style.transform = 'scale(1.1)';
+      document.body.appendChild(dndDragEl);
+      e.target.style.opacity = '0.4';
+    }
+
+    document.addEventListener('pointermove', (e) => {
+      if (!dndDragEl) return;
+      dndDragEl.style.left = (e.clientX - dndOffsetX) + 'px'; dndDragEl.style.top = (e.clientY - dndOffsetY) + 'px';
+      document.querySelectorAll('.drop-slot, #drag-pool').forEach(el => el.classList.remove('drag-over'));
+      const elUnder = document.elementFromPoint(e.clientX, e.clientY);
+      if (elUnder) {
+        const slot = elUnder.closest('.drop-slot'); const pool = elUnder.closest('#drag-pool');
+        if (slot) slot.classList.add('drag-over'); else if (pool) pool.classList.add('drag-over');
+      }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+      if (!dndDragEl) return;
+      const elUnder = document.elementFromPoint(e.clientX, e.clientY);
+      document.body.removeChild(dndDragEl); dndDragEl = null;
+      document.querySelectorAll('.drop-slot, #drag-pool').forEach(el => el.classList.remove('drag-over'));
+
+      let targetSlot = null; let targetPool = false;
+      if (elUnder) {
+        const slot = elUnder.closest('.drop-slot');
+        if (slot) {
+          const attrVal = slot.getAttribute('data-slot');
+          if (attrVal === 'enqueue' || attrVal === 'stack') {
+            targetSlot = attrVal;
+          } else {
+            targetSlot = parseInt(attrVal);
+          }
+        }
+        else if (elUnder.closest('#drag-pool')) targetPool = true;
+      }
+
+      if (targetPool) {
+        if (dndOrigin !== 'pool') {
+          dndState.slots[dndOrigin] = null; dndState.pool.push(dndDragVal);
+          if (dndMissions[currDND].type === 'queue') {
+            dndState.slots = dndState.slots.filter(x => x !== null);
+            while (dndState.slots.length < dndMissions[currDND].slots.length) dndState.slots.push(null);
+          }
+        }
+      } else if (targetSlot === 'enqueue' || targetSlot === 'stack') {
+        let firstEmpty = dndState.slots.indexOf(null);
+        if (firstEmpty !== -1) {
+          if (dndOrigin === 'pool') {
+            const pIdx = dndState.pool.indexOf(dndDragVal);
+            if (pIdx > -1) dndState.pool.splice(pIdx, 1);
+          } else { dndState.slots[dndOrigin] = null; }
+          dndState.slots[firstEmpty] = dndDragVal;
+        }
+      } else if (targetSlot !== null && !isNaN(targetSlot)) {
+        if (currDND === 3 && targetSlot === 0 && dndState.slots[0] === 50) { /* root block */ }
+        else {
+          const existingVal = dndState.slots[targetSlot];
+          if (dndOrigin === 'pool') {
+            const pIdx = dndState.pool.indexOf(dndDragVal);
+            if (pIdx > -1) dndState.pool.splice(pIdx, 1);
+          } else { dndState.slots[dndOrigin] = null; }
+          if (existingVal !== null && existingVal !== dndDragVal) dndState.pool.push(existingVal);
+          dndState.slots[targetSlot] = dndDragVal;
+        }
+      }
+      renderDND();
+      checkDndMission();
+    });
+
+    function dndStackPop() {
+      if (dndAdvanceTimer) { clearTimeout(dndAdvanceTimer); dndAdvanceTimer = null; }
+      let topIdx = -1;
+      for (let i = dndState.slots.length - 1; i >= 0; i--) {
+        if (dndState.slots[i] !== null) {
+          topIdx = i;
+          break;
+        }
+      }
+      if (topIdx !== -1) {
+        let val = dndState.slots[topIdx];
+        dndState.slots[topIdx] = null;
+        dndState.pool.push(val);
+        renderDND();
+        checkDndMission();
+      }
+    }
+
+    function queueDequeue() {
+      let nonNullSlots = dndState.slots.filter(x => x !== null);
+      if (nonNullSlots.length > 0) {
+        let firstVal = nonNullSlots.shift();
+        dndState.slots = [...nonNullSlots];
+        while (dndState.slots.length < dndMissions[currDND].slots.length) {
+          dndState.slots.push(null);
+        }
+        dndState.pool.push(firstVal);
+        renderDND();
+        checkDndMission();
+      }
+    }
+
+    function checkDndMission() {
+      const m = dndMissions[currDND];
+      const msgEl = document.getElementById('dnd-msg');
+      if (dndState.pool.length > 0 && dndState.slots.some(x => x === null)) {
+        msgEl.innerText = ''; msgEl.style.background = 'transparent'; return;
+      }
+      if (m.check(dndState.slots)) {
+        msgEl.innerText = '🎉 Αποστολή Εξετελέσθη! Ετοιμάσου για την επόμενη...';
+        msgEl.style.background = 'rgba(78,205,196,0.2)'; msgEl.style.color = 'var(--c2)';
+        dndAdvanceTimer = setTimeout(() => { dndAdvanceTimer = null; currDND++; initDND(); }, 2000);
+      } else {
+        msgEl.innerText = '💥 Λάθος Τοποθέτηση. Η δομή δεν ακολουθεί τον κανόνα!';
+        msgEl.style.background = 'rgba(255,107,107,0.2)'; msgEl.style.color = 'var(--c1)';
+      }
+    }
+
+
+    // ======== ADVENTURE MODE (8 LEVELS) ========
+    let advLevel = 0;
+    let adv1_backpack = ["Χρυσό Κλειδί", "Σχοινί", "Φακός"]; let adv1_target = "Χρυσό Κλειδί";
+    let adv2_queue = []; let adv2_incoming = [{ name: "Ξύλα", urgent: false }, { name: "Τρόφιμα", urgent: false }, { name: "Φάρμακα (ΕΠΕΙΓΟΝ!)", urgent: true }]; let adv2_current = 0;
+    let adv3_pos = 50;
+    let adv4_current = 'A'; let adv4_fuel = 0;
+    let adv5_step = 0; let adv5_lockers = [null, null, null, null, null];
+    let adv6_state = 0; let adv6_tree = { root: 10, L: 70, R: 60 };
+    let adv7_timer = 15; let adv7_pos = "C";
+    let adv8_st = [0, 75, 30, 45, 10, 20, 50, 15]; let adv8_step = 0;
+    let adv9_connected = false;
+    let adv10_path = "root";
+    let adv11_completed = [];
+    let adv11_nodes = [
+      { id: 'A', x: 50, y: 20 }, { id: 'B', x: 50, y: 160 },
+      { id: 'C', x: 150, y: 20 }, { id: 'D', x: 150, y: 90 },
+      { id: 'E', x: 150, y: 160 }, { id: 'F', x: 250, y: 90 }
+    ];
+    let adv11_edges = [
+      { from: 'A', to: 'C' }, { from: 'A', to: 'D' }, { from: 'B', to: 'D' },
+      { from: 'B', to: 'E' }, { from: 'C', to: 'F' }, { from: 'D', to: 'F' }, { from: 'E', to: 'F' }
+    ];
+    let adv12_nodes = [
+      { id: 'A', x: 50, y: 80 }, { id: 'B', x: 140, y: 20 }, { id: 'C', x: 230, y: 80 },
+      { id: 'D', x: 95, y: 160 }, { id: 'E', x: 185, y: 160 }
+    ];
+    let adv12_edges = [
+      { id: 0, u: 'A', v: 'B', w: 2 }, { id: 1, u: 'B', v: 'C', w: 1 }, { id: 2, u: 'A', v: 'C', w: 6 },
+      { id: 3, u: 'A', v: 'D', w: 4 }, { id: 4, u: 'B', v: 'D', w: 3 }, { id: 5, u: 'C', v: 'E', w: 5 },
+      { id: 6, u: 'D', v: 'E', w: 2 }
+    ];
+    let adv12_selectedEdges = [];
+
+    function initAdventure() { renderAdventureLevel(); }
+
+    function renderAdvLobby(vis) {
+      let html = `<h3 style="color:#FF9F43; font-size:1.8rem; margin-bottom:1rem; text-align:center;">Προθάλαμος Αποστολών</h3><p style="text-align:center; margin-bottom:2rem; color:var(--text);">Διάλεξε ποια αποστολή θέλεις να παίξεις!</p>`;
+      html += `<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:1rem;">`;
+      const missions = [
+        "1. Η Στοίβα", "2. Priority Queue", "3. Εντοπισμός Συνδέσμου", "4. Ισορροπία BST", "5. Hash Table",
+        "6. Max-Heap", "7. Trie Deletion", "8. Segment Tree", "9. Circular List", "10. Directory Tree", "11. Τοπολογική Ταξ.", "12. Δέντρο Επικάλυψης (MST)"
+      ];
+      missions.forEach((m, i) => {
+        html += `<div onclick="advLevel=${i + 1}; renderAdventureLevel();" style="background:rgba(255,159,67,0.1); border:2px solid #FF9F43; border-radius:12px; padding:1.5rem 1rem; text-align:center; cursor:pointer; font-weight:bold; color:#FF9F43; transition:transform 0.2s, background 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255,159,67,0.3)';" onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255,159,67,0.1)';">${m}</div>`;
+      });
+      html += `</div>`;
+      vis.innerHTML = html;
+    }
+
+    function renderAdventureLevel() {
+      if (adv7_int) { clearInterval(adv7_int); adv7_int = null; }
+      const vis = document.getElementById('adventure-vis');
+      if (advLevel === 0) renderAdvLobby(vis);
+      else if (advLevel === 1) renderAdv1(vis);
+      else if (advLevel === 2) renderAdv2(vis);
+      else if (advLevel === 3) renderAdv3(vis);
+      else if (advLevel === 4) renderAdv4(vis);
+      else if (advLevel === 5) renderAdv5(vis);
+      else if (advLevel === 6) renderAdv6(vis);
+      else if (advLevel === 7) renderAdv7(vis);
+      else if (advLevel === 8) renderAdv8(vis);
+      else if (advLevel === 9) renderAdv9(vis);
+      else if (advLevel === 10) renderAdv10(vis);
+      else if (advLevel === 11) renderAdv11(vis);
+      else if (advLevel === 12) renderAdv12(vis);
+
+      if (advLevel > 0) {
+        vis.innerHTML += `<div style="text-align:center; margin-top:3rem; padding-top:1.5rem; border-top:2px dashed rgba(255,255,255,0.1);"><button class="btn btn-red" onclick="advLevel=0; renderAdventureLevel();">⬅️ Επιστροφή στον Προθάλαμο</button></div>`;
+      }
+    }
+
+    function renderAdv1(vis) {
+      let html = `<h3 style="color:var(--c2); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 1: Ο Λαβύρινθος της Στοίβας</h3><p>Χρειάζεσαι το <strong>Χρυσό Κλειδί</strong>, αλλά είναι στον πάτο! Κάνε <strong>Pop</strong> για να βγάλεις το πάνω-πάνω.</p><div style="display:flex; justify-content:center; gap:3rem; margin-top:2rem;"><div style="display:flex; flex-direction:column; align-items:center;"><div style="width:160px; min-height:180px; border:3px solid var(--c2); border-top:none; border-radius:0 0 20px 20px; padding:10px; display:flex; flex-direction:column-reverse; gap:8px;">${adv1_backpack.map(item => `<div style="background:var(--c2); color:#111; padding:12px; text-align:center; border-radius:8px; font-weight:900;">${item}</div>`).join('')}</div></div><div style="font-size:5rem;">🚪</div></div><div style="text-align:center; margin-top:2rem;"><button class="btn btn-teal" style="margin:0 auto;" onclick="adv1_pop()">Pop (Βγάλε το Πάνω)</button></div>`;
+      vis.innerHTML = html;
+    }
+    function adv1_pop() {
+      if (adv1_backpack.length === 0) return; const item = adv1_backpack.pop();
+      if (item === adv1_target) { showModal('🎉 Επιτυχία!', 'Βρήκες το Χρυσό Κλειδί στον πάτο της Στοίβας! Η πόρτα άνοιξε.', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); }); }
+      else { showModal('Συνέχισε...', `Έβγαλες: ${item}. Το κλειδί είναι πιο κάτω!`, 'OK', renderAdventureLevel); }
+    }
+
+    let adv2_items = [
+      { id: 1, name: "Έγγραφο (Χαμηλή)", prio: 1, arrival: 1 },
+      { id: 2, name: "Ενημέρωση (Μεσαία)", prio: 2, arrival: 2 },
+      { id: 3, name: "Κλήση (Υψηλή)", prio: 3, arrival: 3 },
+      { id: 4, name: "Email (Χαμηλή)", prio: 1, arrival: 4 },
+      { id: 5, name: "Σφάλμα (Υψηλή)", prio: 3, arrival: 5 }
+    ];
+    let adv2_selected = null;
+
+    function renderAdv2(vis) {
+      let html = `<h3 style="color:var(--c8); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 2: Η Γέφυρα της Ουράς (Priority Queue)</h3><p>Ταξινόμησε τις διεργασίες: πρώτα οι Υψηλής, μετά Μεσαίας, μετά Χαμηλής. Σε ίδια προτεραιότητα, κερδίζει αυτό που ήρθε νωρίτερα (μικρότερο ID άφιξης)! Κάνε κλικ σε 2 για Swap.</p><div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin:2rem 0;">`;
+      html += adv2_items.map((it, i) => `<div style="padding:10px; border:2px solid ${adv2_selected === i ? 'var(--c1)' : 'var(--muted)'}; border-radius:8px; cursor:pointer; background:#111; user-select:none;" onclick="adv2_swap(${i})"><b>${it.name}</b><br><small>Άφιξη: ${it.arrival}</small></div>`).join('');
+      html += `</div><div style="text-align:center;"><button class="btn btn-gold" style="margin:0 auto;" onclick="adv2_execute()">Εκτέλεση Ουράς</button></div>`;
+      vis.innerHTML = html;
+    }
+    function adv2_swap(idx) {
+      if (adv2_selected === null) adv2_selected = idx;
+      else {
+        if (adv2_selected !== idx) {
+          let tmp = adv2_items[adv2_selected];
+          adv2_items[adv2_selected] = adv2_items[idx];
+          adv2_items[idx] = tmp;
+        }
+        adv2_selected = null;
+      }
+      renderAdventureLevel();
+    }
+    function adv2_execute() {
+      let correct = [...adv2_items].sort((a, b) => b.prio - a.prio || a.arrival - b.arrival);
+      let isCorrect = true;
+      for (let i = 0; i < 5; i++) { if (adv2_items[i].id !== correct[i].id) { isCorrect = false; break; } }
+      if (isCorrect) { showModal('🎉 Μπράβο!', 'Η ουρά προτεραιότητας λειτούργησε άψογα!', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); }); }
+      else { showModal('💥 Αποτυχία!', 'Λάθος σειρά! Θυμήσου: Υψηλή > Μεσαία > Χαμηλή, και FIFO στις ίδιες.', 'Δοκίμασε Ξανά', () => { adv2_selected = null; renderAdventureLevel(); }); }
+    }
+
+    function renderAdv3(vis) {
+      let html = `<h3 style="color:var(--c5); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 3: Το Δάσος των Δέντρων</h3><p>Ο θησαυρός είναι στο <strong>40</strong>. Μικρότερα = Αριστερά, Μεγαλύτερα = Δεξιά.</p><div style="text-align:center; margin:2rem 0; font-size:2rem;">Είσαι στο: <strong style="color:var(--c5); font-size:4rem;">${adv3_pos}</strong></div><div style="display:flex; justify-content:center; gap:2rem;"><button class="btn btn-purple" onclick="adv3_move('L')">&larr; ΑΡΙΣΤΕΡΑ (Μικρότερα)</button><button class="btn btn-pink" onclick="adv3_move('R')">ΔΕΞΙΑ &rarr; (Μεγαλύτερα)</button></div>`;
+      vis.innerHTML = html;
+    }
+    function adv3_move(dir) {
+      if (adv3_pos === 50) { if (dir === 'L') { adv3_pos = 30; renderAdventureLevel(); } else { showModal('Χάθηκες!', 'Το 40 ΔΕΝ είναι μεγαλύτερο από το 50.', 'Πάλι', () => { adv3_pos = 50; renderAdventureLevel(); }); } }
+      else if (adv3_pos === 30) { if (dir === 'R') { showModal('🎉 Μπράβο!', 'Βρήκες τον θησαυρό!', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); }); } else { showModal('Χάθηκες!', 'Το 40 ΔΕΝ είναι μικρότερο από το 30.', 'Πάλι', () => { adv3_pos = 50; renderAdventureLevel(); }); } }
+    }
+
+    function renderAdv4(vis) {
+      if (adv4_current === 'B') {
+        if (adv4_fuel === 6) { showModal('🏆 Dijkstra Master!', 'Βρήκες τη συντομότερη διαδρομή (A &rarr; C &rarr; D &rarr; B) με κόστος 6!', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); }); }
+        else { showModal('Όχι αρκετά σύντομο!', `Ξόδεψες ${adv4_fuel} καύσιμα. Υπάρχει πιο σύντομη διαδρομή!`, 'Πάλι', () => { adv4_current = 'A'; adv4_fuel = 0; renderAdventureLevel(); }); }
+        return;
+      }
+      let html = `<h3 style="color:#FF9F43; font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 4: Το Δίκτυο των Γράφων</h3><p>Πήγαινε στην <strong>Πόλη Β</strong> με τη λιγότερη δυνατή βενζίνη!</p><div style="text-align:center; font-size:1.2rem; color:var(--c3);">Καύσιμα: ${adv4_fuel}</div><div style="position:relative; height:250px; background:rgba(0,0,0,0.4); border-radius:15px; margin-top:1rem; max-width:400px; margin-left:auto; margin-right:auto;"><div style="position:absolute; top:100px; left:20px; width:40px; height:40px; background:${adv4_current === 'A' ? 'var(--c1)' : '#333'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; z-index:2;">A</div><div style="position:absolute; top:20px; left:120px; width:40px; height:40px; background:${adv4_current === 'C' ? 'var(--c1)' : '#333'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; z-index:2; cursor:pointer;" onclick="adv4_go('C')">C</div><div style="position:absolute; top:180px; left:120px; width:40px; height:40px; background:${adv4_current === 'E' ? 'var(--c1)' : '#333'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; z-index:2; cursor:pointer;" onclick="adv4_go('E')">E</div><div style="position:absolute; top:60px; left:220px; width:40px; height:40px; background:${adv4_current === 'D' ? 'var(--c1)' : '#333'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; z-index:2; cursor:pointer;" onclick="adv4_go('D')">D</div><div style="position:absolute; top:100px; left:320px; width:40px; height:40px; background:${adv4_current === 'B' ? 'var(--c1)' : '#333'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; z-index:2; cursor:pointer;" onclick="adv4_go('B')">B</div><svg width="100%" height="250" style="position:absolute; top:0; left:0; z-index:1;"><line x1="40" y1="120" x2="340" y2="120" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5,5"/> <text x="180" y="115" fill="#fff">9⛽</text><line x1="40" y1="120" x2="140" y2="40" stroke="var(--muted)" stroke-width="2"/> <text x="70" y="70" fill="#fff">2⛽</text><line x1="40" y1="120" x2="140" y2="200" stroke="var(--muted)" stroke-width="2"/> <text x="70" y="180" fill="#fff">4⛽</text><line x1="140" y1="40" x2="240" y2="80" stroke="var(--muted)" stroke-width="2"/> <text x="190" y="50" fill="#fff">1⛽</text><line x1="140" y1="200" x2="340" y2="120" stroke="var(--muted)" stroke-width="2"/> <text x="250" y="180" fill="#fff">6⛽</text><line x1="240" y1="80" x2="340" y2="120" stroke="var(--muted)" stroke-width="2"/> <text x="290" y="90" fill="#fff">3⛽</text></svg></div>`;
+      vis.innerHTML = html;
+    }
+    function adv4_go(t) {
+      if (adv4_current === 'A') { if (t === 'B') { adv4_fuel += 9; adv4_current = 'B'; } else if (t === 'C') { adv4_fuel += 2; adv4_current = 'C'; } else if (t === 'E') { adv4_fuel += 4; adv4_current = 'E'; } }
+      else if (adv4_current === 'C' && t === 'D') { adv4_fuel += 1; adv4_current = 'D'; } else if (adv4_current === 'E' && t === 'B') { adv4_fuel += 6; adv4_current = 'B'; } else if (adv4_current === 'D' && t === 'B') { adv4_fuel += 3; adv4_current = 'B'; }
+      renderAdventureLevel();
+    }
+
+    let adv5_keys = [12, 13];
+    let adv5_table = Array(7).fill(null);
+    let adv5_curr = 0;
+
+    function renderAdv5(vis) {
+      if (adv5_curr >= 2) {
+        showModal('🎉 Τέλεια!', 'Όλα τα κλειδιά τοποθετήθηκαν σωστά με Linear Probing!', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); });
+        adv5_curr = 0;
+        adv5_table = Array(7).fill(null);
+        adv5_keys = [12, 13];
+        return;
+      }
+      let key = adv5_keys[adv5_curr];
+      let html = `<h3 style="color:var(--c4); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 5: Hash Tables & Linear Probing</h3><p>Συνάρτηση: <strong>H(x) = (2x + 3) mod 7</strong></p><p>Υπολόγισε το H(${key}) και κάνε κλικ στη σωστή θέση του πίνακα. Αν υπάρχει σύγκρουση, βρες την επόμενη κενή θέση!</p><div style="text-align:center; font-size:1.5rem; color:var(--c1); margin:1rem 0;">Τρέχον Κλειδί: <strong>${key}</strong></div><div style="display:flex; justify-content:center; gap:0.5rem; margin-top:2rem;">`;
+      for (let i = 0; i < 7; i++) {
+        html += `<div style="width:50px; height:60px; border:2px solid var(--muted); border-radius:8px; display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="adv5_place(${i})"><div style="color:var(--muted); font-size:0.8rem;">[${i}]</div><div style="margin-top:5px; font-weight:bold; color:var(--c4);">${adv5_table[i] !== null ? adv5_table[i] : ''}</div></div>`;
+      }
+      html += `</div>`;
+      vis.innerHTML = html;
+    }
+
+    function adv5_place(slotIdx) {
+      let key = adv5_keys[adv5_curr];
+      let expectedHash = ((2 * key) + 3) % 7;
+      let correctSlot = expectedHash;
+      while (adv5_table[correctSlot] !== null) {
+        correctSlot = (correctSlot + 1) % 7;
+      }
+      if (slotIdx === correctSlot) {
+        adv5_table[slotIdx] = key;
+        adv5_curr++;
+        renderAdventureLevel();
+      } else {
+        let newKey = Math.floor(Math.random() * 25) + 1;
+        adv5_keys[adv5_curr] = newKey;
+        showModal('Λάθος Θέση! ❌', `Το ${key} έπρεπε να πάει στη θέση ${correctSlot}.<br><br>Το κλειδί άλλαξε τυχαία σε <strong>${newKey}</strong>!`, 'Ξανά', () => { renderAdventureLevel(); });
+      }
+    }
+
+    let adv6_heap = [10, 40, 20, 50, 30];
+    let adv6_selected = null;
+
+    function renderAdv6(vis) {
+      let html = `<h3 style="color:var(--c7); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 6: Σωρός (Max-Heap) από το Μηδέν</h3><p>Αυτοί οι 5 αριθμοί ΔΕΝ είναι Max-Heap. Κάνε κλικ σε 2 κόμβους για να τους ανταλλάξεις. Φτιάξε το δέντρο έτσι ώστε <strong>κάθε γονιός να είναι μεγαλύτερος από τα παιδιά του!</strong></p><div style="position:relative; height:200px; width:300px; margin:2rem auto;">`;
+      const pos = [{ x: 130, y: 0 }, { x: 50, y: 80 }, { x: 210, y: 80 }, { x: 10, y: 160 }, { x: 90, y: 160 }];
+      html += `<svg width="300" height="200" style="position:absolute; top:0; left:0; z-index:-1;">
+    <line x1="150" y1="20" x2="70" y2="100" stroke="var(--muted)" stroke-width="2"/>
+    <line x1="150" y1="20" x2="230" y2="100" stroke="var(--muted)" stroke-width="2"/>
+    <line x1="70" y1="100" x2="30" y2="180" stroke="var(--muted)" stroke-width="2"/>
+    <line x1="70" y1="100" x2="110" y2="180" stroke="var(--muted)" stroke-width="2"/>
+  </svg>`;
+      for (let i = 0; i < 5; i++) {
+        html += `<div style="position:absolute; top:${pos[i].y}px; left:${pos[i].x}px; width:40px; height:40px; background:${adv6_selected === i ? 'var(--c1)' : 'var(--c7)'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#111; cursor:pointer;" onclick="adv6_swap(${i})">${adv6_heap[i]}</div>`;
+      }
+      html += `</div><div style="text-align:center;"><button class="btn btn-teal" style="margin:0 auto;" onclick="adv6_check()">Επιβεβαίωση Max-Heap</button></div>`;
+      vis.innerHTML = html;
+    }
+    function adv6_swap(idx) {
+      if (adv6_selected === null) adv6_selected = idx;
+      else {
+        let tmp = adv6_heap[adv6_selected];
+        adv6_heap[adv6_selected] = adv6_heap[idx];
+        adv6_heap[idx] = tmp;
+        adv6_selected = null;
+      }
+      renderAdventureLevel();
+    }
+    function adv6_check() {
+      let isHeap = true;
+      if (adv6_heap[0] < adv6_heap[1] || adv6_heap[0] < adv6_heap[2]) isHeap = false;
+      if (adv6_heap[1] < adv6_heap[3] || adv6_heap[1] < adv6_heap[4]) isHeap = false;
+      if (isHeap) showModal('🎉 Τέλειο Heapify!', 'Αναδόμησες πλήρως το δέντρο!', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); });
+      else showModal('Λάθος!', 'Δεν είναι έγκυρο Max-Heap (κάποιος γονιός είναι μικρότερος από το παιδί του).', 'Πάλι', null);
+    }
+
+    let adv7_nodes = [
+      { id: 0, label: 'C', x: 60, y: 40, shared: true, del: false },
+      { id: 1, label: 'A', x: 60, y: 90, shared: true, del: false },
+      { id: 2, label: 'R', x: 30, y: 140, shared: true, del: false },
+      { id: 3, label: 'T', x: 30, y: 190, shared: false, del: false },
+      { id: 4, label: 'T', x: 90, y: 140, shared: false, del: false },
+      { id: 5, label: 'D', x: 180, y: 40, shared: true, del: false },
+      { id: 6, label: 'O', x: 180, y: 90, shared: true, del: false },
+      { id: 7, label: 'G', x: 150, y: 140, shared: false, del: false },
+      { id: 8, label: 'O', x: 210, y: 140, shared: false, del: false },
+      { id: 9, label: 'R', x: 210, y: 190, shared: false, del: false }
+    ];
+    let adv7_edges = [[0, 1], [1, 2], [2, 3], [1, 4], [5, 6], [6, 7], [6, 8], [8, 9]];
+
+    function renderAdv7(vis) {
+      let html = `<h3 style="color:#A29BFE; font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 7: Δέντρο Προθεμάτων (Trie)</h3><p>Διάγραψε εντελώς τη λέξη <strong>DOOR</strong> κάνοντας κλικ στους κόμβους της (bottom-up). Προσοχή: ΜΗΝ διαγράψεις κόμβους που μοιράζονται με άλλες λέξεις (όπως το DOG)!</p><div style="position:relative; height:240px; width:280px; margin:2rem auto;">`;
+      html += `<svg width="280" height="240" style="position:absolute; top:0; left:0; z-index:-1;">`;
+      adv7_edges.forEach(e => {
+        if (!adv7_nodes[e[0]].del && !adv7_nodes[e[1]].del) {
+          html += `<line x1="${adv7_nodes[e[0]].x + 20}" y1="${adv7_nodes[e[0]].y + 20}" x2="${adv7_nodes[e[1]].x + 20}" y2="${adv7_nodes[e[1]].y + 20}" stroke="var(--muted)" stroke-width="2"/>`;
+        }
+      });
+      html += `</svg>`;
+      adv7_nodes.forEach(n => {
+        if (!n.del) html += `<div style="position:absolute; top:${n.y}px; left:${n.x}px; width:40px; height:40px; background:var(--c4); border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; cursor:pointer;" onclick="adv7_click(${n.id})">${n.label}</div>`;
+      });
+      html += `</div>`;
+      if (adv7_nodes[8].del && adv7_nodes[9].del) { html += `<div style="text-align:center;"><button class="btn btn-teal" style="margin:0 auto;" onclick="advLevel++; renderAdventureLevel();">Επόμενο Επίπεδο</button></div>`; }
+      vis.innerHTML = html;
+    }
+
+    function adv7_click(id) {
+      if (adv7_nodes[id].shared) {
+        showModal('Λάθος!', 'Αυτός ο κόμβος μοιράζεται με άλλη λέξη. Δεν μπορείς να τον διαγράψεις! Το παιχνίδι επαναφέρεται.', 'Πάλι', () => { adv7_nodes.forEach(n => n.del = false); renderAdventureLevel(); });
+      } else {
+        if (id !== 8 && id !== 9) {
+          showModal('Λάθος Λέξη!', 'Προσπαθείς να διαγράψεις άλλη λέξη! Το παιχνίδι επαναφέρεται.', 'Πάλι', () => { adv7_nodes.forEach(n => n.del = false); renderAdventureLevel(); });
+          return;
+        }
+        if (id === 8 && !adv7_nodes[9].del) {
+          showModal('Λάθος Σειρά!', 'Πρέπει να διαγράψεις το παιδί (R) πριν διαγράψεις τον γονιό (O)!', 'Πάλι', () => { adv7_nodes.forEach(n => n.del = false); renderAdventureLevel(); });
+          return;
+        }
+        adv7_nodes[id].del = true;
+        if (adv7_nodes[8].del && adv7_nodes[9].del) { showModal('🎉 Τέλεια!', 'Διέγραψες τη λέξη DOOR με ασφάλεια!', 'ΟΚ', renderAdventureLevel); }
+        else { renderAdventureLevel(); }
+      }
+    }
+
+    function renderAdv8(vis) {
+      let html = `<h3 style="color:#00CEC9; font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 8: Point Update (Segment Tree)</h3><p>Το 3ο στοιχείο άλλαξε ξαφνικά από 30 σε <strong>50</strong>! Ενημέρωσε το <strong>Άθροισμα</strong> των γονικών κόμβων από κάτω προς τα πάνω!</p><div style="display:flex; flex-direction:column; align-items:center; margin-top:2rem;"><!-- Root --><div style="width:60px; height:40px; background:${adv8_st[1] === 95 ? 'var(--c7)' : '#333'}; color:#fff; border-radius:8px; display:flex; justify-content:center; align-items:center; font-weight:bold; cursor:pointer;" onclick="adv8_click(1)">Sum: ${adv8_st[1]}</div><div style="display:flex; gap:40px; margin-top:20px;"><div style="width:60px; height:40px; background:#333; color:#fff; border-radius:8px; display:flex; justify-content:center; align-items:center; font-weight:bold;">Sum: 30</div><div style="width:60px; height:40px; background:${adv8_st[3] === 65 ? 'var(--c7)' : '#333'}; color:#fff; border-radius:8px; display:flex; justify-content:center; align-items:center; font-weight:bold; cursor:pointer;" onclick="adv8_click(3)">Sum: ${adv8_st[3]}</div></div><div style="display:flex; gap:10px; margin-top:20px;"><div style="width:40px; height:60px; background:var(--muted); border-radius:4px 4px 0 0; display:flex; justify-content:center; align-items:center;">10</div><div style="width:40px; height:60px; background:var(--muted); border-radius:4px 4px 0 0; display:flex; justify-content:center; align-items:center;">20</div><div style="width:40px; height:60px; background:var(--c1); border-radius:4px 4px 0 0; color:#fff; font-weight:bold; display:flex; justify-content:center; align-items:center; transform:scale(1.1); box-shadow:0 0 10px var(--c1);">50</div><div style="width:40px; height:60px; background:var(--muted); border-radius:4px 4px 0 0; display:flex; justify-content:center; align-items:center;">15</div></div></div>`;
+      vis.innerHTML = html;
+    }
+    function adv8_click(idx) {
+      if (idx === 3 && adv8_step === 0) {
+        showPrompt("Ποιο είναι το νέο άθροισμα γι' αυτόν τον κόμβο (50 + 15);", "", (v) => {
+          if (v === "65") { adv8_st[3] = 65; adv8_step = 1; renderAdventureLevel(); }
+          else if (v !== null) showModal("Λάθος", "Το άθροισμα των παιδιών του είναι 50 + 15 = 65.", "ΟΚ", null);
+        });
+      }
+      else if (idx === 1 && adv8_step === 1) {
+        showPrompt("Ποιο είναι το νέο άθροισμα γι' αυτή τη ρίζα (30 + 65);", "", (v) => {
+          if (v === "95") { adv8_st[1] = 95; showModal('🎉 Τέλεια!', 'Ενημέρωσες το Segment Tree επιτυχώς σε O(log n) χρόνο!', 'Επόμενο Επίπεδο', () => { advLevel++; renderAdventureLevel(); }); }
+          else if (v !== null) showModal("Λάθος", "Το άθροισμα των παιδιών της είναι 30 + 65 = 95.", "ΟΚ", null);
+        });
+      }
+      else { showModal('Λάθος Σειρά', 'Πρέπει να ανανεώσεις το δέντρο από ΚΑΤΩ προς τα ΠΑΝΩ. Ενημέρωσε πρώτα τον άμεσο γονιό!', 'ΟΚ', null); }
+    }
+
+    function renderAdv9(vis) {
+      let html = `<h3 style="color:var(--c4); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 9: Ο Χαμένος Δείκτης (Circular List)</h3><p>Η Κυκλική Λίστα κόπηκε! Ο τελευταίος κόμβος (C) δείχνει στο NULL αντί να γυρίζει στην αρχή (A). Βοήθησε να αποκατασταθεί ο δείκτης!</p><div style="display:flex; justify-content:center; align-items:center; gap:0.5rem; margin-top:2rem;"><div class="ll-box" style="border-color:var(--c4)66;"><div class="ll-val" style="background:var(--c4)22;color:var(--c4)">A</div><div class="ll-ptr" style="border-color:var(--c4)44;">&rarr;</div></div><span class="ll-arrow">&rarr;</span><div class="ll-box" style="border-color:var(--c4)66;"><div class="ll-val" style="background:var(--c4)22;color:var(--c4)">B</div><div class="ll-ptr" style="border-color:var(--c4)44;">&rarr;</div></div><span class="ll-arrow">&rarr;</span><div class="ll-box" style="border-color:var(--c4)66;"><div class="ll-val" style="background:var(--c4)22;color:var(--c4)">C</div><div class="ll-ptr" style="border-color:var(--c4)44;">&rarr;</div></div><span class="ll-arrow">&rarr;</span>${adv9_connected ? `<div class="ll-box" style="border-color:var(--c1)66;"><div class="ll-val" style="background:var(--c1)22;color:var(--c1)">A (Κύκλος!)</div></div>` : `<div class="ll-null">NULL</div>`}</div><div style="text-align:center; margin-top:2rem;">${!adv9_connected ? `<button class="btn btn-purple" style="margin:0 auto;" onclick="adv9_connect()">Σύνδεσε το C με το A!</button>` : `<button class="btn btn-teal" style="margin:0 auto;" onclick="adv9_next()">Επόμενο Επίπεδο</button>`}</div>`;
+      vis.innerHTML = html;
+    }
+    function adv9_connect() { adv9_connected = true; renderAdventureLevel(); }
+    function adv9_next() { advLevel++; renderAdventureLevel(); }
+
+    function renderAdv10(vis) {
+      let isTarget = adv10_path === 'root/Folder2/secret_file.txt';
+      let html = `<h3 style="color:var(--c5); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 10: Εξερεύνηση Δέντρου Καταλόγων</h3><p>Βρες το αρχείο <strong>secret_file.txt</strong>. Κάνε κλικ στους φακέλους για να κατέβεις στο δέντρο!</p><div style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:8px; margin:1rem 0; font-family:monospace; color:var(--c3); text-align:left;">Διαδρομή: ${adv10_path}</div><div style="display:flex; justify-content:center; gap:1rem;">`;
+      if (adv10_path === 'root') {
+        html += `<button class="btn btn-gray" onclick="adv10_open('Folder1')">📁 Folder1</button><button class="btn btn-gray" onclick="adv10_open('Folder2')">📁 Folder2</button>`;
+      } else if (adv10_path === 'root/Folder1') {
+        html += `<button class="btn btn-gray" onclick="adv10_open('fileA.png')">📄 fileA.png</button><button class="btn btn-gray" onclick="adv10_open('fileB.png')">📄 fileB.png</button><button class="btn btn-red" onclick="adv10_open('root')">Άνω Επίπεδο (Back)</button>`;
+      } else if (adv10_path === 'root/Folder2') {
+        html += `<button class="btn btn-gray" onclick="adv10_open('secret_file.txt')">📄 secret_file.txt</button><button class="btn btn-red" onclick="adv10_open('root')">Άνω Επίπεδο (Back)</button>`;
+      } else if (isTarget) {
+        html += `<div style="color:var(--c2); font-weight:bold; font-size:1.5rem;">Βρήκες το αρχείο!</div>`;
+      } else {
+        html += `<div style="color:var(--c1); font-weight:bold;">Λάθος Αρχείο...</div><button class="btn btn-red" onclick="adv10_open('root')">Αρχή</button>`;
+      }
+      html += `</div>`;
+      if (isTarget) html += `<div style="text-align:center; margin-top:2rem;"><button class="btn btn-teal" style="margin:0 auto;" onclick="adv10_next()">Επόμενο Επίπεδο</button></div>`;
+      vis.innerHTML = html;
+    }
+    function adv10_open(name) { if (name === 'root') adv10_path = 'root'; else adv10_path += '/' + name; renderAdventureLevel(); }
+    function adv10_next() { advLevel++; renderAdventureLevel(); }
+
+    function renderAdv11(vis) {
+      let html = `<h3 style="color:#00CEC9; font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 11: Τοπολογική Ταξινόμηση (DAG)</h3><p>Ολοκλήρωσε τις εργασίες (Α-F) κάνοντας κλικ! Μια εργασία ξεκλειδώνει ΜΟΝΟ όταν έχουν ολοκληρωθεί όλες όσες δείχνουν προς αυτή (Dependencies).</p><div style="position:relative; height:260px; max-width:320px; margin:2rem auto; background:rgba(0,0,0,0.3); border-radius:12px;">`;
+      html += `<svg width="100%" height="260" style="position:absolute; top:0; left:0; pointer-events:none;"><defs><marker id="arrow11" markerWidth="15" markerHeight="10" refX="28" refY="5" orient="auto"><polygon points="0 0, 15 5, 0 10" fill="#00CEC9"/></marker></defs>`;
+      adv11_edges.forEach(e => {
+        let n1 = adv11_nodes.find(n => n.id === e.from); let n2 = adv11_nodes.find(n => n.id === e.to);
+        html += `<line x1="${n1.x + 20}" y1="${n1.y + 20}" x2="${n2.x + 20}" y2="${n2.y + 20}" stroke="#00CEC9" stroke-width="2" marker-end="url(#arrow11)"/>`;
+      });
+      html += `</svg>`;
+      adv11_nodes.forEach(n => {
+        let isCompleted = adv11_completed.includes(n.id);
+        let bg = isCompleted ? 'var(--c2)' : '#333';
+        html += `<div style="position:absolute; top:${n.y}px; left:${n.x}px; width:40px; height:40px; background:${bg}; border-radius:50%; border:2px solid #00CEC9; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; cursor:pointer; box-shadow:${isCompleted ? '0 0 15px var(--c2)' : 'none'}" onclick="adv11_click('${n.id}')">${n.id}</div>`;
+      });
+      html += `</div>`;
+      if (adv11_completed.length === adv11_nodes.length) { html += `<div style="text-align:center;"><button class="btn btn-teal" style="margin:0 auto;" onclick="adv11_finish()">Επόμενο Επίπεδο</button></div>`; }
+      vis.innerHTML = html;
+    }
+
+    function adv11_click(id) {
+      if (adv11_completed.includes(id)) return;
+      let dependencies = adv11_edges.filter(e => e.to === id).map(e => e.from);
+      let missing = dependencies.filter(d => !adv11_completed.includes(d));
+      if (missing.length > 0) {
+        showModal('Εκκρεμείς Εξαρτήσεις!', `Η εργασία ${id} εξαρτάται από: ${missing.join(', ')}. Ολοκλήρωσέ τες πρώτα!`, 'ΟΚ', null);
+      } else {
+        adv11_completed.push(id);
+        renderAdventureLevel();
+      }
+    }
+    function adv11_finish() { advLevel++; renderAdventureLevel(); }
+
+    function checkCycleMST(edgesToTest) {
+      let parent = {}; adv12_nodes.forEach(n => parent[n.id] = n.id);
+      function find(i) { if (parent[i] === i) return i; return parent[i] = find(parent[i]); }
+      for (let e of edgesToTest) {
+        let rootU = find(e.u), rootV = find(e.v);
+        if (rootU === rootV) return true; // cycle
+        parent[rootU] = rootV;
+      }
+      return false;
+    }
+
+    function renderAdv12(vis) {
+      let html = `<h3 style="color:var(--c1); font-size:1.6rem; margin-bottom:1rem;">Επίπεδο 12: Ελάχιστο Δέντρο Επικάλυψης (MST)</h3><p>Σύνδεσε όλους τους κόμβους (πόλεις) με το Ελάχιστο δυνατό Κόστος! <strong>Κάνε κλικ πάνω στις γραμμές (ακμές)</strong> για να τις επιλέξεις. Απαγορεύεται να δημιουργήσεις κύκλους.</p><div style="position:relative; height:240px; max-width:320px; margin:2rem auto; background:rgba(0,0,0,0.3); border-radius:12px;">`;
+      html += `<svg width="100%" height="240" style="position:absolute; top:0; left:0;">`;
+      adv12_edges.forEach(e => {
+        let n1 = adv12_nodes.find(n => n.id === e.u); let n2 = adv12_nodes.find(n => n.id === e.v);
+        let isSelected = adv12_selectedEdges.includes(e.id);
+        let stroke = isSelected ? 'var(--c1)' : 'rgba(255,255,255,0.3)';
+        let sw = isSelected ? 5 : 2;
+        html += `<line x1="${n1.x + 20}" y1="${n1.y + 20}" x2="${n2.x + 20}" y2="${n2.y + 20}" stroke="${stroke}" stroke-width="${sw}"/>`;
+        html += `<text x="${(n1.x + n2.x) / 2 + 20}" y="${(n1.y + n2.y) / 2 + 20}" fill="white" font-weight="bold" font-size="15" text-anchor="middle" dominant-baseline="central" style="text-shadow:0 0 5px black; pointer-events:none;">${e.w}</text>`;
+        html += `<line x1="${n1.x + 20}" y1="${n1.y + 20}" x2="${n2.x + 20}" y2="${n2.y + 20}" stroke="transparent" stroke-width="25" style="cursor:pointer;" onclick="adv12_click(${e.id})"/>`;
+      });
+      html += `</svg>`;
+      adv12_nodes.forEach(n => {
+        html += `<div style="position:absolute; top:${n.y}px; left:${n.x}px; width:40px; height:40px; background:var(--c4); border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; pointer-events:none;">${n.id}</div>`;
+      });
+      html += `</div>`;
+
+      let currentCost = adv12_selectedEdges.reduce((sum, id) => sum + adv12_edges.find(e => e.id === id).w, 0);
+      html += `<div style="text-align:center; font-size:1.2rem; margin-bottom:1rem;">Τρέχον Κόστος: <strong>${currentCost}</strong></div>`;
+      vis.innerHTML = html;
+    }
+
+    function adv12_click(id) {
+      if (adv12_selectedEdges.includes(id)) {
+        adv12_selectedEdges = adv12_selectedEdges.filter(x => x !== id);
+        renderAdventureLevel();
+        return;
+      }
+
+      if (adv12_selectedEdges.length >= adv12_nodes.length - 1) {
+        showModal('Προσοχή!', 'Έχεις ήδη επιλέξει αρκετές ακμές! Αφαίρεσε μία πριν προσθέσεις άλλη.', 'ΟΚ', null);
+        return;
+      }
+
+      let testEdges = adv12_selectedEdges.map(eid => adv12_edges.find(e => e.id === eid));
+      testEdges.push(adv12_edges.find(e => e.id === id));
+
+      if (checkCycleMST(testEdges)) {
+        showModal('Λάθος: Δημιουργία Κύκλου!', 'Ένα δέντρο δεν πρέπει να περιέχει κύκλους. Αν επιλέξεις αυτή την ακμή, σχηματίζεται κύκλος (εναλλακτική διαδρομή)!', 'ΟΚ', null);
+        return;
+      }
+
+      adv12_selectedEdges.push(id);
+      renderAdventureLevel();
+
+      if (adv12_selectedEdges.length === adv12_nodes.length - 1) {
+        let cost = adv12_selectedEdges.reduce((sum, eid) => sum + adv12_edges.find(e => e.id === eid).w, 0);
+        if (cost === 8) {
+          showModal('🏆 Συγχαρητήρια!', 'Βρήκες το Ελάχιστο Δέντρο Επικάλυψης (MST) με συνολικό κόστος 8! Είσαι πλέον Master στις Δομές Δεδομένων!', 'Τερματισμός Περιπέτειας', () => { advLevel = 0; renderAdventureLevel(); });
+        } else {
+          showModal('Όχι το Ελάχιστο...', `Το κόστος σου είναι ${cost}. Υπάρχει καλύτερη (φθηνότερη) διαδρομή! Αποεπιλέξτε μερικές ακμές και δοκιμάστε ξανά.`, 'ΟΚ', null);
+        }
+      }
+    }
+
+    window.addEventListener('resize', () => { treeRender(); heapRender(); });
+  </script>
+</body>
+
+</html>
